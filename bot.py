@@ -26,18 +26,22 @@ def convert_dhms(duration):
 	duration = int(duration)
 	return (duration // 86400, (duration // 3600) % 24, (duration // 60) % 60, duration % 60)
 
-def convert_hms(duration):
-	duration = int(duration)
-	return (duration // 3600, (duration // 60) % 60, duration % 60)
 		
 bot = UTBot("=")
+
+help_color = 0x55AAFF
+error_color = 0xFF4406
 
 docs = {
 	"uptime": f"Usage : `{bot.prefix}uptime`\nRenvoie le temps écoulé depuis le lancement du bot",
 	"clear": f"Usage : `{bot.prefix}clear <nombre de messages à supprimer>`\nSupprime les derniers messages",
 	"logout": f"Usage : `{bot.prefix}logout`\nDéconnecte le bot",
 	"ping": f"Usage : `{bot.prefix}ping`\nRenvoie la latence du bot",
+	"help": f"Usage : `{bot.prefix}help <commande>`\nDonne de l’aide sur une commande",
 }
+
+def doc_embed(command, color):
+	return discord.Embed(color=color, title=f"Aide sur {command}", description=docs[command])
 
 @bot.event
 async def on_ready():
@@ -77,10 +81,10 @@ async def on_message(message):
 
 		elif command == "clear":
 			if len(args) != 1:
-				await message.channel.send(docs["clear"])
+				await message.channel.send(embed=doc_embed("clear", error_color))
 				return
 			if not args[0].isdigit():
-				await message.channel.send(docs["clear"])
+				await message.channel.send(embed=doc_embed("clear", error_color))
 				return
 				
 			number = int(args[0])
@@ -91,9 +95,9 @@ async def on_message(message):
 			print("-----------------------------")
 
 			await message.channel.purge(limit=number +1)
-			await message.channel.send(embed=discord.Embed(color=0x00ff00, description=f":x: **``{number}`` messages supprimé(s)** :x:"))
+			alert = await message.channel.send(embed=discord.Embed(color=0x00ff00, description=f":x: **``{number}`` messages supprimé(s)** :x:"))
 			await asyncio.sleep(6)
-			await message.channel.purge(limit=1)
+			await alert.delete()
 
 		elif command == "ping":
 			print("-----------------------------")
@@ -107,19 +111,22 @@ async def on_message(message):
 			print("-----------------------------")
 			print("Logout")
 			print("-----------------------------")
-			heures, minutes, secondes = convert_hms(bot.uptime())
-			await message.channel.send(embed=discord.Embed(color=0xffff00, description=f"Déconnection.. durée d'execution : ``{jours}j {heures:02d}:{minutes:02d}:{secondes:02d}``"))
+			alert = await message.channel.send(embed=discord.Embed(color=0xffff00, description=f"Déconnection.. durée d'execution : ``{jours}j {heures:02d}:{minutes:02d}:{secondes:02d}``"))
 			await bot.change_presence(status=discord.Status.idle, activity=discord.Game(name="Déconnexion.."))
 			await asyncio.sleep(2)
-			await message.channel.purge(limit=2)
+			await message.delete()
+			await alert.delete()
 			await bot.logout()
 		
 		elif command == "help":
-			if len(args) != 1:
-				await message.channel.send(docs["help"])
+			if len(args) == 0:
+				await message.channel.send(embed=discord.Embed(color=help_color, title="Liste des commandes", description="\n".join(list(docs.keys())) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
+			elif len(args) > 1:
+				await message.channel.send(embed=doc_embed("help", error_color))
 			elif args[0] not in docs.keys():
-				await message.channel.send(docs["help"])
+				await message.channel.send(embed=discord.Embed(color=error_color, description=f"La commande {args[0]} est inconnue"))
+				await message.channel.send(embed=discord.Embed(color=error_color, title="Liste des commandes", description="\n".join(list(docs.keys()))))
 			else:
-				await message.channel.send(docs[args[0]])
+				await message.channel.send(embed=doc_embed(args[0], help_color))
 
 bot.run()
