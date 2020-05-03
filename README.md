@@ -39,5 +39,5 @@ python3 -m pip install -U discord.py[voice]
 py -3-m pip install -U discord.py[voice]
 ```
 
-plus d'info ici: https://pypi.org/project/discord.py/
-vidéo tutoriel (EN) : https://youtu.be/5yahh4tR0L0
+- plus d'info ici: https://pypi.org/project/discord.py/  
+- vidéo tutoriel (EN) : https://youtu.be/5yahh4tR0L0
