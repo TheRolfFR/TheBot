@@ -19,25 +19,45 @@ Toutes les personnes présentes sur le Discord UTBiscord.
 - [ ] Strawpoll
 - [ ] Traducteur
 
-## :wrench: Installation de discord.py
+## :wrench: Dépendances système
 
-La version classique:
+- virtualenv
+- python3
+
+
+## :wrench: Installation du projet
+
+Linux:
 ```
-# Linux/macOS
-python3 -m pip install -U discord.py
-pip install googletrans
+git clone https://github.com/UTBiscord/bot-discord.git
+cd bot-discord
+
+virtualenv --system-site-packages --python=python3 env
+source env/bin/activate
+
+pip install -r requirements.txt
+
+```
+
+## Démarage du projet
+
+Linux:
+```
+source env/bin/activate
+python bot.py
+
+```
 
 # Windows
+```
+La version sans le support de la voix:
+```
 py -3-m pip install -U discord.py
-```
 
+```
 La version avec le support de voix:
-```
-# Linux/macOS
-python3 -m pip install -U discord.py[voice]
-pip install googletrans
 
-# Windows
+```
 py -3-m pip install -U discord.py[voice]
 ```
 
