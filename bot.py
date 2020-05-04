@@ -1,6 +1,6 @@
 import time
 import discord, asyncio
-from googletrans import Translator
+import googletrans
 from discord.ext import commands
 
 class UTBot (discord.Client):
@@ -36,10 +36,28 @@ docs = {
 	"logout": f"Usage : `{bot.prefix}logout`\nDéconnecte le bot",
 	"ping": f"Usage : `{bot.prefix}ping`\nRenvoie la latence du bot",
 	"help": f"Usage : `{bot.prefix}help <commande>`\nDonne de l’aide sur une commande",
+	"trad": f"Usage : `{bot.prefix}trad [-<code langue>] <texte à traduire>`\nTraduit du texte.\nExemples :\n`{bot.prefix}trad Texte en français` : Traduit le français en anglais par défaut\n`{bot.prefix}trad Text in another language` : Traduit les autres langues en français par défaut\n`{bot.prefix}trad -de Texte` : Traduit dans une autre langue (utilisez un code à deux lettres comme sur https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1)", 
+}
+
+flag_emotes_fixes = {
+	"af": "za", "am": "et", "be": "by", "bn": "bg", "bs": "ba", "ca": "white", "ceb": "ph", "co": "white", "cs": "cz",
+	"da": "dk", "eo": "white", "ny": "mw", "ar": "sa", "fy": "white", "gl": "white", "ka": "ge", "en": "gb", "et": "ee",
+	"eu": "white", "hy": "am", "sq": "al", "sv": "se", "tl": "ph", "zh-cn": "cn", "zh-tw": "tw", "el": "gr", "gu": "in",
+	"ha": "ne", "haw": "white", "iw": "il", "hi": "in", "hmn": "white", "ig": "ng", "ga": "ie", "jw": "id", "kn": "in",
+	"kk": "kz", "km": "kh", "ko": "kr", "ku": "white", "ky": "kg", "la": "lo", "la": "white", "lb": "lu", "ms": "my", "ml": "in",
+	"mi": "nz", "mr": "in", "my": "mm", "ne": "np", "ps": "af", "fa": "ir", "pa": "in", "sm": "ws", "gd": "white", "sr": "rs",
+	"st": "ls", "sn": "zw", "sd": "pk", "si": "lk", "sl": "si", "su": "sd", "sw": "ke", "tg": "tj", "tm": "in", "te": "in", 
+	"uk": "ua", "ur": "pk", "vi": "vn", "cy": "white", "xh": "za", "yi": "white", "yo": "bj", "zu": "za", "fil": "ph", "he": "il",
 }
 
 def doc_embed(command, color):
 	return discord.Embed(color=color, title=f"Aide sur {command}", description=docs[command])
+
+def fix_flag(dest):
+	if dest in flag_emotes_fixes:
+		return flag_emotes_fixes[dest]
+	else:
+		return dest
 
 @bot.event
 async def on_ready():
@@ -64,7 +82,7 @@ async def on_message(message):
 		jours, heures, minutes, secondes = convert_dhms(bot.uptime())
 		
 		# Découpage de la commande `<prefixe><commande> <arg1> <arg2> …`
-		commandtokens = message.content.lstrip(bot.prefix).split(" ")
+		commandtokens = message.content.strip().lstrip(bot.prefix).split(" ")
 		command = commandtokens[0]
 		args = commandtokens[1:]
 		
@@ -128,15 +146,36 @@ async def on_message(message):
 				await message.channel.send(embed=doc_embed(args[0], help_color))
 
 		elif command == "trad":
-			translator = Translator()
-			language = translator.detect(message.content[6:])
-			if language.lang == 'en':
-				translation = translator.translate(message.content[6:], dest='fr')
+			if len(args) == 0:  # Requête vide
+				await message.channel.send(embed=doc_embed("trad", error_color))
+				return
+			
+			translator = googletrans.Translator()
+			
+			if args[0].startswith("-"): 
+				text = message.content[6:].partition(" ")[2].strip()
+				if text == "":
+					await message.channel.send(embed=doc_embed("trad", error_color))
+					return
+				destination = args[0].strip("-")
+				if destination not in googletrans.LANGUAGES:
+					await message.channel.send(embed=discord.Embed(color=error_color, description="Code de langue invalide. Les codes sont des codes à 2 lettres comme donnés sur https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1"))
+					return
+				source = translator.detect(text)
+				
 			else:
-				translation = translator.translate(message.content[6:], dest='en')
-			embed = discord.Embed(title=message.author.name, color=help_color, description=translation.text)
+				text = message.content[6:]
+				source = translator.detect(text)
+				destination = "en" if source.lang == "fr" else "fr"
+				
+			translation = translator.translate(text, src=source.lang, dest=destination)
+			embed = discord.Embed(title=message.author.name, color=help_color, description=f":flag_{fix_flag(source.lang)}:->:flag_{fix_flag(destination)}:  {translation.text}")
 			embed.set_footer(text=translation.origin)
 			await message.channel.send(embed=embed)
 			await message.delete()
+
+@bot.event
+async def on_message_edit(before, after):
+	await on_message(after)
 
 bot.run()
