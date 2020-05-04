@@ -25,6 +25,7 @@ La version classique:
 ```
 # Linux/macOS
 python3 -m pip install -U discord.py
+pip install googletrans
 
 # Windows
 py -3-m pip install -U discord.py
@@ -34,6 +35,7 @@ La version avec le support de voix:
 ```
 # Linux/macOS
 python3 -m pip install -U discord.py[voice]
+pip install googletrans
 
 # Windows
 py -3-m pip install -U discord.py[voice]

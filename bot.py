@@ -1,9 +1,7 @@
 import time
 import discord, asyncio
+from googletrans import Translator
 from discord.ext import commands
-
-# yellow color=0xffff00
-# green color=0x00ff00
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -128,5 +126,17 @@ async def on_message(message):
 				await message.channel.send(embed=discord.Embed(color=error_color, title="Liste des commandes", description="\n".join(list(docs.keys()))))
 			else:
 				await message.channel.send(embed=doc_embed(args[0], help_color))
+
+		elif command == "trad":
+			translator = Translator()
+			language = translator.detect(message.content[6:])
+			if language.lang == 'en':
+				translation = translator.translate(message.content[6:], dest='fr')
+			else:
+				translation = translator.translate(message.content[6:], dest='en')
+			embed = discord.Embed(title=message.author.name, color=help_color, description=translation.text)
+			embed.set_footer(text=translation.origin)
+			await message.channel.send(embed=embed)
+			await message.delete()
 
 bot.run()
