@@ -1,7 +1,12 @@
 import time
-import discord, asyncio
-from googletrans import Translator
+import asyncio
+
+import discord
 from discord.ext import commands
+import googletrans
+
+from data import *
+
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -25,21 +30,16 @@ def convert_dhms(duration):
 	return (duration // 86400, (duration // 3600) % 24, (duration // 60) % 60, duration % 60)
 
 		
-bot = UTBot("=")
-
-help_color = 0x55AAFF
-error_color = 0xFF4406
-
-docs = {
-	"uptime": f"Usage : `{bot.prefix}uptime`\nRenvoie le temps écoulé depuis le lancement du bot",
-	"clear": f"Usage : `{bot.prefix}clear <nombre de messages à supprimer>`\nSupprime les derniers messages",
-	"logout": f"Usage : `{bot.prefix}logout`\nDéconnecte le bot",
-	"ping": f"Usage : `{bot.prefix}ping`\nRenvoie la latence du bot",
-	"help": f"Usage : `{bot.prefix}help <commande>`\nDonne de l’aide sur une commande",
-}
+bot = UTBot(bot_prefix)
 
 def doc_embed(command, color):
 	return discord.Embed(color=color, title=f"Aide sur {command}", description=docs[command])
+
+def fix_flag(dest):
+	if dest in flag_emotes_fixes:
+		return flag_emotes_fixes[dest]
+	else:
+		return dest
 
 @bot.event
 async def on_ready():
@@ -64,7 +64,7 @@ async def on_message(message):
 		jours, heures, minutes, secondes = convert_dhms(bot.uptime())
 		
 		# Découpage de la commande `<prefixe><commande> <arg1> <arg2> …`
-		commandtokens = message.content.lstrip(bot.prefix).split(" ")
+		commandtokens = message.content.strip().lstrip(bot.prefix).split(" ")
 		command = commandtokens[0]
 		args = commandtokens[1:]
 		
@@ -74,7 +74,7 @@ async def on_message(message):
 			print("Temps écoulé")
 			print(f"{jours}:{heures:02d}:{minutes:02d}:{secondes:02d}")
 			print("-----------------------------")
-			await message.channel.send(f"Temps écoulé depuis démarrage : ``{jours}``j ``{heures}``h ``{minutes}``min ``{secondes}``s")
+			await message.channel.send(embed=discord.Embed(color=0xFFFF00, description=f"Temps écoulé depuis démarrage : ``{jours}``j ``{heures}``h ``{minutes}``min ``{secondes}``s"))
 
 
 		elif command == "clear":
@@ -128,15 +128,36 @@ async def on_message(message):
 				await message.channel.send(embed=doc_embed(args[0], help_color))
 
 		elif command == "trad":
-			translator = Translator()
-			language = translator.detect(message.content[6:])
-			if language.lang == 'en':
-				translation = translator.translate(message.content[6:], dest='fr')
+			if len(args) == 0:  # Requête vide
+				await message.channel.send(embed=doc_embed("trad", error_color))
+				return
+			
+			translator = googletrans.Translator()
+			
+			if args[0].startswith("-"): 
+				text = message.content[6:].partition(" ")[2].strip()
+				if text == "":
+					await message.channel.send(embed=doc_embed("trad", error_color))
+					return
+				destination = args[0].strip("-")
+				if destination not in googletrans.LANGUAGES:
+					await message.channel.send(embed=discord.Embed(color=error_color, description="Code de langue invalide. Les codes sont des codes à 2 lettres comme donnés sur https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1"))
+					return
+				source = translator.detect(text)
+				
 			else:
-				translation = translator.translate(message.content[6:], dest='en')
-			embed = discord.Embed(title=message.author.name, color=help_color, description=translation.text)
+				text = message.content[6:]
+				source = translator.detect(text)
+				destination = "en" if source.lang == "fr" else "fr"
+				
+			translation = translator.translate(text, src=source.lang, dest=destination)
+			embed = discord.Embed(title=message.author.name, color=help_color, description=f":flag_{fix_flag(source.lang)}:->:flag_{fix_flag(destination)}:  {translation.text}")
 			embed.set_footer(text=translation.origin)
 			await message.channel.send(embed=embed)
 			await message.delete()
+
+@bot.event
+async def on_message_edit(before, after):
+	await on_message(after)
 
 bot.run()
