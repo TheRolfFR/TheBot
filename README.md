@@ -49,7 +49,7 @@ python bot.py
 ```
 
 # Windows
-```
+
 La version sans le support de la voix:
 ```
 py -3-m pip install -U discord.py
