@@ -19,6 +19,9 @@ Toutes les personnes présentes sur le Discord UTBiscord.
 - [ ] Strawpoll
 - [ ] Traducteur
 
+
+# Linux
+
 ## :wrench: Dépendances système
 
 - virtualenv
@@ -27,7 +30,6 @@ Toutes les personnes présentes sur le Discord UTBiscord.
 
 ## :wrench: Installation du projet
 
-Linux:
 ```
 git clone https://github.com/UTBiscord/bot-discord.git
 cd bot-discord
@@ -39,9 +41,8 @@ pip install -r requirements.txt
 
 ```
 
-## Démarage du projet
+## :wrench: Démarage du projet
 
-Linux:
 ```
 source env/bin/activate
 python bot.py
