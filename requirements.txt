@@ -1,3 +1,0 @@
-discord
-googletrans
-black
