@@ -25,7 +25,7 @@ Toutes les personnes présentes sur le Discord UTBiscord.
 ## :wrench: Dépendances système
 
 - virtualenv
-- python3
+- python3.5
 
 
 ## :wrench: Installation du projet
