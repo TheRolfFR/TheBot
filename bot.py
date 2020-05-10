@@ -1,7 +1,11 @@
 import time
-import discord, asyncio
-from googletrans import Translator
-from discord.ext import commands
+import asyncio
+
+import discord
+import googletrans
+
+from settings import *
+from commands import BOT_COMMANDS
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -19,27 +23,16 @@ class UTBot (discord.Client):
 	
 	def uptime(self):
 		return time.time() - self.launchtime
-		
-def convert_dhms(duration):
-	duration = int(duration)
-	return (duration // 86400, (duration // 3600) % 24, (duration // 60) % 60, duration % 60)
+	
+	def doc_embed(self, command, color):
+		if command == "help":
+			text = cmd_help.__doc__
+		else:
+			text = BOT_COMMANDS[command].__doc__
+		return discord.Embed(title=f"Aide sur {command}", description=text.format(bot_prefix=self.prefix), color=color)
 
 		
-bot = UTBot("=")
-
-help_color = 0x55AAFF
-error_color = 0xFF4406
-
-docs = {
-	"uptime": f"Usage : `{bot.prefix}uptime`\nRenvoie le temps écoulé depuis le lancement du bot",
-	"clear": f"Usage : `{bot.prefix}clear <nombre de messages à supprimer>`\nSupprime les derniers messages",
-	"logout": f"Usage : `{bot.prefix}logout`\nDéconnecte le bot",
-	"ping": f"Usage : `{bot.prefix}ping`\nRenvoie la latence du bot",
-	"help": f"Usage : `{bot.prefix}help <commande>`\nDonne de l’aide sur une commande",
-}
-
-def doc_embed(command, color):
-	return discord.Embed(color=color, title=f"Aide sur {command}", description=docs[command])
+bot = UTBot(PREFIX)
 
 @bot.event
 async def on_ready():
@@ -54,89 +47,44 @@ async def on_ready():
 	await asyncio.sleep(4)
 	bot.launchtime = time.time()
 	await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Opérationnel !"))
+	
 
-# Liste des commandes
+
+async def cmd_help(bot, message, command, args):
+	"""
+	Usage : `{bot_prefix}help <commande>`
+	Donne de l’aide sur une commande
+	"""
+	if len(args) == 0:
+		await message.channel.send(embed=discord.Embed(color=HELP_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys())) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
+	elif len(args) > 1:
+		await message.channel.send(embed=bot.doc_embed("help", ERROR_COLOR))
+	elif args[0] in BOT_COMMANDS.keys() or args[0] == "help":
+		await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
+	else:
+		await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, description=f"La commande {args[0]} est inconnue"))
+		await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys()))))
+
+
 @bot.event
 async def on_message(message):
 	if message.author.id == bot.user.id: return  # Évite que le bot traite ses propres messages, en général optimisation mineure, mais ça peut éviter des soucis dans certains cas
 	
 	if message.content.startswith(bot.prefix):  # Filtre les commandes d’entrée
-		jours, heures, minutes, secondes = convert_dhms(bot.uptime())
-		
 		# Découpage de la commande `<prefixe><commande> <arg1> <arg2> …`
-		commandtokens = message.content.lstrip(bot.prefix).split(" ")
+		commandtokens = message.content.strip().lstrip(bot.prefix).split(" ")
 		command = commandtokens[0]
 		args = commandtokens[1:]
 		
-		if command == "uptime":
-			jours, heures, minutes, secondes = convert_dhms(bot.uptime())
-			print("-----------------------------")
-			print("Temps écoulé")
-			print(f"{jours}:{heures:02d}:{minutes:02d}:{secondes:02d}")
-			print("-----------------------------")
-			await message.channel.send(f"Temps écoulé depuis démarrage : ``{jours}``j ``{heures}``h ``{minutes}``min ``{secondes}``s")
+		if command == "help":
+			await cmd_help(bot, message, command, args)
+		if command in BOT_COMMANDS.keys():
+			await BOT_COMMANDS[command](bot, message, command, args)
+			
+			
 
-
-		elif command == "clear":
-			if len(args) != 1:
-				await message.channel.send(embed=doc_embed("clear", error_color))
-				return
-			if not args[0].isdigit():
-				await message.channel.send(embed=doc_embed("clear", error_color))
-				return
-				
-			number = int(args[0])
-
-			print("-----------------------------")
-			print("Clear text")
-			print(f"{jours:02d}:{heures:02d}:{minutes:02d}:{secondes:02d}")
-			print("-----------------------------")
-
-			await message.channel.purge(limit=number +1)
-			alert = await message.channel.send(embed=discord.Embed(color=0x00ff00, description=f":x: **``{number}`` messages supprimé(s)** :x:"))
-			await asyncio.sleep(6)
-			await alert.delete()
-
-		elif command == "ping":
-			print("-----------------------------")
-			print("Ping")
-			print(f"{jours}:{heures:02d}:{minutes:02d}:{secondes:02d}")
-			print("-----------------------------")
-			ping = round(bot.latency * 1000)
-			await message.channel.send(embed=discord.Embed(color=0x00ff00, description=f"**Ma latence est de ``{ping}``ms** :ping_pong: "))
-		
-		elif command == "logout":
-			print("-----------------------------")
-			print("Logout")
-			print("-----------------------------")
-			alert = await message.channel.send(embed=discord.Embed(color=0xffff00, description=f"Déconnection.. durée d'execution : ``{jours}j {heures:02d}:{minutes:02d}:{secondes:02d}``"))
-			await bot.change_presence(status=discord.Status.idle, activity=discord.Game(name="Déconnexion.."))
-			await asyncio.sleep(2)
-			await message.delete()
-			await alert.delete()
-			await bot.logout()
-		
-		elif command == "help":
-			if len(args) == 0:
-				await message.channel.send(embed=discord.Embed(color=help_color, title="Liste des commandes", description="\n".join(list(docs.keys())) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
-			elif len(args) > 1:
-				await message.channel.send(embed=doc_embed("help", error_color))
-			elif args[0] not in docs.keys():
-				await message.channel.send(embed=discord.Embed(color=error_color, description=f"La commande {args[0]} est inconnue"))
-				await message.channel.send(embed=discord.Embed(color=error_color, title="Liste des commandes", description="\n".join(list(docs.keys()))))
-			else:
-				await message.channel.send(embed=doc_embed(args[0], help_color))
-
-		elif command == "trad":
-			translator = Translator()
-			language = translator.detect(message.content[6:])
-			if language.lang == 'en':
-				translation = translator.translate(message.content[6:], dest='fr')
-			else:
-				translation = translator.translate(message.content[6:], dest='en')
-			embed = discord.Embed(title=message.author.name, color=help_color, description=translation.text)
-			embed.set_footer(text=translation.origin)
-			await message.channel.send(embed=embed)
-			await message.delete()
+@bot.event
+async def on_message_edit(before, after):
+	await on_message(after)
 
 bot.run()
