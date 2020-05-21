@@ -1,0 +1,10 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: drone
+  image: drone
+  commands:
+  - python3 bot.py
