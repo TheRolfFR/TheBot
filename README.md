@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ```
 source env/bin/activate
-python bot.py
+python DISCORD_TOKER="entrez le token juste ici" bot.py
 
 ```
 
