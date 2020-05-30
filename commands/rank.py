@@ -280,3 +280,69 @@ async def cmd_role_info(bot, message, command, args):
         )
 
     session.close()
+
+
+async def cmd_add_role(bot, message, command, args):
+    """
+	Usage : `{bot_prefix}addrole <nom du role> [couleur hexadécimal]`
+	Ajoute un nouveau role
+	"""
+
+    ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
+
+    if ds_role not in message.author.roles:
+        await message.channel.send(
+            embed=discord.Embed(
+                title=f"Aide sur {command}",
+                description=f"Vous n'avez pas la permission pour faire cette commande",
+                color=ERROR_COLOR,
+            )
+        )
+        return
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    role_name = ""
+    role_color = ""
+    db_roles = session.query(Role).all()
+
+    pattern = " ([A-Fa-f0-9]{6})$"
+    if re.search(pattern, message.content):
+        role_color = re.findall(pattern, message.content)[0]
+        pattern = "^=addrole (.*) ([A-Fa-f0-9)]{6})?$"
+        if not re.search(pattern, message.content):
+            await message.channel.send(embed=bot.doc_embed("addrole", ERROR_COLOR))
+            return
+        role_name = re.findall(pattern, message.content)[0][0]
+    else:
+        role_color = "dddddd"
+        pattern = "^=addrole (.*)"
+        if not re.search(pattern, message.content):
+            await message.channel.send(embed=bot.doc_embed("addrole", ERROR_COLOR))
+            return
+        role_name = re.findall(pattern, message.content)[0]
+
+    if role_name not in (_db_roles.name for _db_roles in db_roles):
+        db_role = Role(name=role_name, color=role_color, is_rank=False, count=0)
+        session.add(db_role)
+        session.commit()
+
+    if role_name not in (_ds_roles.name for _ds_roles in message.guild.roles):
+        guild = message.guild
+        await guild.create_role(
+            name=role_name, color=discord.Colour(int(role_color, 16))
+        )
+        await message.channel.send(
+            embed=discord.Embed(
+                description=f"{role_name} est désormais disponible", color=CONFIRM_COLOR
+            )
+        )
+    else:
+        await message.channel.send(
+            embed=discord.Embed(
+                description=f"Le rang {role_name} existe déjà", color=ERROR_COLOR
+            )
+        )
+
+    session.close()

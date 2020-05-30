@@ -15,4 +15,5 @@ BOT_COMMANDS = {
     "delrank": cmd_del_rank,
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
+    "addrole": cmd_add_role,
 }
