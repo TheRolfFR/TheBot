@@ -8,10 +8,10 @@ steps:
     name: publish
     settings: 
       password: 
-        from-secret: docker_password
+        from_secret: docker_password
       repo: cyl07/bot-discord
       username: 
-        from-secret: docker_username
+        from_secret: docker_username
     when: 
       branch: master
       event: push
