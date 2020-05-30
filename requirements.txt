@@ -1,3 +1,4 @@
 discord
 googletrans
 black
+sqlalchemy

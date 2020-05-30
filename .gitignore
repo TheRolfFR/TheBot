@@ -128,5 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#vscode
+.vscode/
+
 # Custom
 token.txt
+app.db
