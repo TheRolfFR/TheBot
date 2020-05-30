@@ -16,3 +16,6 @@ steps:
   when:
   	branch: master
     event: push
+
+- name: deploy
+  image: bot-discord
