@@ -4,7 +4,15 @@ type: docker
 name: default
 
 steps:
-- name: drone
-  image: drone
+- name: publish
+  image: plugins/docker
   commands:
-  - python3 bot.py
+  settings:
+  	repo: Cyl/bot-discord
+    username:
+    	from-secret: docker_username
+    password:
+    	from-secret: docker_password
+  when:
+  	branch: master
+    event: push
