@@ -15,3 +15,21 @@ steps:
     when: 
       branch: master
       event: push
+  - name: deploy
+    image: appleboy/drone-ssh
+    environment:
+      SSH_PASSWORD:
+        from_secret: ssh_password_sudo
+    settings:
+      host:
+        from_secret: ssh_host
+      username:
+        from_secret: ssh_username
+      password:
+        from_secret: ssh_password
+      envs: [ SSH_PASSWORD ]
+      script:
+        - echo $SSH_PASSWORD | sudo -S systemctl restart bot-discord.service
+    when:
+      branch: master
+      event: push
