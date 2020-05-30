@@ -1,10 +1,17 @@
----
+--- 
 kind: pipeline
 type: docker
 name: default
-
-steps:
-- name: drone
-  image: drone
-  commands:
-  - python3 bot.py
+steps: 
+  - 
+    image: plugins/docker
+    name: publish
+    settings: 
+      password: 
+        from_secret: docker_password
+      repo: cyl07/bot-discord
+      username: 
+        from_secret: docker_username
+    when: 
+      branch: master
+      event: push
