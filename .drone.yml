@@ -1,21 +1,17 @@
----
+--- 
 kind: pipeline
 type: docker
 name: default
-
-steps:
-- name: publish
-  image: plugins/docker
-  commands:
-  settings:
-  	repo: Cyl/bot-discord
-    username:
-    	from-secret: docker_username
-    password:
-    	from-secret: docker_password
-  when:
-  	branch: master
-    event: push
-
-- name: deploy
-  image: bot-discord
+steps: 
+  - 
+    image: plugins/docker
+    name: publish
+    settings: 
+      password: 
+        from-secret: docker_password
+      repo: Cyl/bot-discord
+      username: 
+        from-secret: docker_username
+    when: 
+      branch: master
+      event: push
