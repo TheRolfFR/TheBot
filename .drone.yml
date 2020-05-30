@@ -27,6 +27,8 @@ steps:
         from_secret: ssh_username
       password:
         from_secret: ssh_password
+      port:
+        from_secret: ssh_port
       envs: [ SSH_PASSWORD ]
       script:
         - echo $SSH_PASSWORD | sudo -S systemctl restart bot-discord.service
