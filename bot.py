@@ -1,5 +1,6 @@
 import time
 import asyncio
+import os
 
 import discord
 import googletrans
@@ -17,9 +18,7 @@ class UTBot (discord.Client):
 		super().run(self.read_token())
 	
 	def read_token(self):
-		with open("token.txt", "r") as f:
-			token = f.read().strip()
-		return token
+		return os.environ.get("DISCORD_TOKEN", "")
 	
 	def uptime(self):
 		return time.time() - self.launchtime
