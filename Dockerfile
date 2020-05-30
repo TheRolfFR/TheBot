@@ -1,9 +1,9 @@
 FROM python:3
 
-ADD ./bot-discord/ /app/
+ADD ./ /app/
 
 WORKDIR /app
-COPY ./bot-discord/requirements.txt ./
+COPY ./requirements.txt ./
 
 RUN pip install --upgrade pip && \
 pip install --no-cache-dir -r requirements.txt
