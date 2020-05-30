@@ -9,7 +9,7 @@ steps:
     settings: 
       password: 
         from-secret: docker_password
-      repo: Cyl/bot-discord
+      repo: cyl07/bot-discord
       username: 
         from-secret: docker_username
     when: 
