@@ -2,6 +2,7 @@ from .botcontrol import cmd_uptime, cmd_ping, cmd_logout
 from .translate import cmd_trad
 from .moderation import cmd_clear
 from .rank import *
+from .rageux import cmd_rageux
 
 BOT_COMMANDS = {
     "uptime": cmd_uptime,
@@ -16,4 +17,5 @@ BOT_COMMANDS = {
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
     "addrole": cmd_add_role,
+    "rageux": cmd_rageux
 }

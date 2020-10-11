@@ -2,3 +2,4 @@ discord
 googletrans
 black
 sqlalchemy
+Pillow
