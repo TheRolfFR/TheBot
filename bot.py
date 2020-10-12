@@ -18,7 +18,14 @@ class UTBot (discord.Client):
 		super().run(self.read_token())
 	
 	def read_token(self):
-		return os.environ.get("DISCORD_TOKEN", "")
+		token = os.environ.get("DISCORD_TOKEN", "")
+
+		if token == "":
+			f = open("token.txt")
+			token = f.read()
+			f.close()
+
+		return token
 	
 	def uptime(self):
 		return time.time() - self.launchtime
