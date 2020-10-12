@@ -59,7 +59,7 @@ py -3-m pip install -U discord.py
 La version avec le support de voix:
 
 ```
-py -3-m pip install -U discord.py[voice]
+py -3-m pip install -U discord.py[voice] 
 ```
 
 - plus d'info ici: https://pypi.org/project/discord.py/  
