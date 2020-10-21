@@ -2,6 +2,7 @@
 #pour le francophone ce site est simple http://fluxradios.blogspot.com/
 
 radioList = {
+  'ClassicFM': 'http://media-ice.musicradio.com/ClassicFMMP3'
   'RadioClassique': 'http://radioclassique.ice.infomaniak.ch/radioclassique-high.mp3',
   'RadioSuisseJazz': 'http://stream.srg-ssr.ch/m/rsj/mp3_128',
   'Skyrock': 'http://icecast.skyrock.net/s/natio_mp3_128k',
