@@ -3,3 +3,4 @@ googletrans
 black
 sqlalchemy
 Pillow
+PyNaCl
