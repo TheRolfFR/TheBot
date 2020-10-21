@@ -3,6 +3,11 @@ from .translate import cmd_trad
 from .moderation import cmd_clear
 from .rank import *
 from .rageux import cmd_rageux
+from .radioplayer import RadioPlayer
+from .radioplayer.disconnectvocal import disconnectVocal
+from .rank import *
+
+radio = RadioPlayer()
 
 BOT_COMMANDS = {
     "uptime": cmd_uptime,
@@ -17,5 +22,8 @@ BOT_COMMANDS = {
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
     "addrole": cmd_add_role,
-    "rageux": cmd_rageux
+    "rageux": cmd_rageux,
+    "playRadio": radio.playRadio,
+    "stopRadio": radio.stopRadio,
+    "disconnectVocal": disconnectVocal
 }
