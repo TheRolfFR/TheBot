@@ -54,6 +54,11 @@ async def cmd_logout(bot, message, command, args):
             )
         )
         return
+    
+    # disconnects bot from every audio channel
+    for index in range(len(bot.voice_clients)):
+        vc = bot.voice_clients[index]
+        await vc.disconnect()
 
     print("-----------------------------")
     print("Logout")
