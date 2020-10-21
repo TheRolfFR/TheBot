@@ -5,5 +5,6 @@ radioList = {
   'RadioClassique': 'http://radioclassique.ice.infomaniak.ch/radioclassique-high.mp3',
   'RadioSuisseJazz': 'http://stream.srg-ssr.ch/m/rsj/mp3_128',
   'Skyrock': 'http://icecast.skyrock.net/s/natio_mp3_128k',
-  'RadioRegenbogen': 'https://streams.regenbogen.de/rr-mannheim-128-mp3'
+  'RadioRegenbogen': 'https://streams.regenbogen.de/rr-mannheim-128-mp3',
+  'RadioBeur': 'https://beurfm.ice.infomaniak.ch/beurfm-high.mp3'
 }
