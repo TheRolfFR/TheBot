@@ -32,6 +32,8 @@ class RadioPlayer:
         if not (isinstance(args, str) or isinstance(args, list)):
             return
 
+        if not discord.opus.is_loaded():
+            discord.opus.load_opus()
         radioName = None
         if isinstance(args, str):
             radioName = args
