@@ -18,12 +18,12 @@ class RadioPlayer:
   def __init__(self):
     self.voiceClientSessionID = 0
     self.vc = None
+    self.radiosAvailable = '\n'.join(radioList.keys())
 
   async def playRadio(self, bot, message, command, args):
     """
     Usage : `{bot_prefix}playRadio <radioName>`
-    RadioSuisseJazz, Skyrock, RadioClassique
-    Joue la radio
+    Joue la radio ou les liste
     """
 
     # I need a text argument after
@@ -32,17 +32,26 @@ class RadioPlayer:
 
     radioName = None
     if isinstance(args, str):
-      radioName = args
+      radioName = args.strip()
 
-    if isinstance(args, list):
+    if isinstance(args, list) and len(args):
       radioName = args[0]
 
+    if radioName is None:
+      # This is not an error, you must list the radios
+      error = await message.channel.send(
+        embed=discord.Embed(
+          color=STATUS_COLOR,
+          description= "Radios disponibles :\n" + self.radiosAvailable,
+        )
+      )
+      return
+
     if radioList.get(radioName) is None:
-      radiosAvailable = '\n'.join(radioList.keys())
       error = await message.channel.send(
         embed=discord.Embed(
           color=ERROR_COLOR,
-          description= message.author.mention + ", impossible de trouver la radio " + radioName + ". Radios disponibles :\n" + radiosAvailable,
+          description= message.author.mention + ", impossible de trouver la radio " + radioName + ". Radios disponibles :\n" + self.radiosAvailable,
         )
       )
       await asyncio.sleep(2)
