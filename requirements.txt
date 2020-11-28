@@ -3,3 +3,5 @@ googletrans
 black
 sqlalchemy
 Pillow
+PyNaCl
+discord.py[voice]
