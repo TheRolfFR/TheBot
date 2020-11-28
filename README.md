@@ -1,6 +1,6 @@
 # Création du Bot Discord de l'UTBiscord
 
-###### tags: `discord` `bot` `open-source` `python`
+###### tags: `discord` `bot` `open-source` `python` 
 
 ## :memo: Informations :
 
