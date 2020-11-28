@@ -5,3 +5,4 @@ sqlalchemy
 Pillow
 PyNaCl
 discord.py[voice]
+requests
