@@ -24,7 +24,7 @@ class RadioPlayer:
     async def playRadio(self, bot, message, command, args):
         """
     Usage : `{bot_prefix}playRadio <radioName>`
-    Joue la radio ou les liste
+    Joue la radio
     """
     
         # I need a text argument after
