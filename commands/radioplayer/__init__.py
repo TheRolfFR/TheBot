@@ -32,8 +32,6 @@ class RadioPlayer:
         if not (isinstance(args, str) or isinstance(args, list)):
             return
 
-        if not discord.opus.is_loaded():
-            discord.opus.load_opus()
         radioName = None
         if isinstance(args, str):
             radioName = args
@@ -101,7 +99,7 @@ class RadioPlayer:
         print("Playing " + radioName + ": " + source + " in " + channel)
 
         self.vc.play(
-            discord.FFmpegPCMAudio(executable="./database/ffmpeg", source=source)
+            discord.FFmpegPCMAudio(source=source)
         )
 
     async def stopRadio(self, bot, message, command, args):
