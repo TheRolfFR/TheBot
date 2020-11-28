@@ -2,6 +2,7 @@
 
 ###### tags: `discord` `bot` `open-source` `python`
 
+
 ## :memo: Informations :
 
 ### Quel language ?
@@ -13,7 +14,7 @@ Le python, simple et efficace sera utilisé.
 Toutes les personnes présentes sur le Discord UTBiscord.
 
 ### Principales fonctionnalitées à implémenter:
-- [ ] Modération
+- [x] Modération
 - [ ] Attribution des rôles de jeux
 - [ ] Musique
 - [ ] Strawpoll
