@@ -24,10 +24,9 @@ class RadioPlayer:
     async def playRadio(self, bot, message, command, args):
         """
     Usage : `{bot_prefix}playRadio <radioName>`
-    RadioSuisseJazz, Skyrock, RadioClassique
     Joue la radio
     """
-
+    
         # I need a text argument after
         if not (isinstance(args, str) or isinstance(args, list)):
             return
