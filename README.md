@@ -1,3 +1,4 @@
+![TheBot](logo/theBot_200px.png)
 # TheBot - Bot Discord de l'UTBiscord
 
 ###### tags: `discord` `bot` `open-source` `python`
