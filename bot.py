@@ -5,6 +5,8 @@ import os
 import discord
 import googletrans
 
+import keep_alive
+
 from settings import *
 from commands import BOT_COMMANDS
 
@@ -92,5 +94,8 @@ async def on_message(message):
 @bot.event
 async def on_message_edit(before, after):
 	await on_message(after)
+
+# start the server to stay alive
+keep_alive.keep_alive()
 
 bot.run()

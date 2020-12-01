@@ -6,3 +6,4 @@ Pillow
 PyNaCl
 discord.py[voice]
 requests
+flask
