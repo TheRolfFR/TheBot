@@ -1,9 +1,9 @@
-# Création du Bot Discord de l'UTBiscord
+# TheBot - Bot Discord de l'UTBiscord
 
 ###### tags: `discord` `bot` `open-source` `python`
 
 
-## :memo: Informations :
+## 📝 Informations :
 
 ### Quel language ?
 
@@ -16,52 +16,51 @@ Toutes les personnes présentes sur le Discord UTBiscord.
 ### Principales fonctionnalitées à implémenter:
 - [x] Modération
 - [ ] Attribution des rôles de jeux
+- [x] Radio
 - [ ] Musique
 - [ ] Strawpoll
 - [ ] Traducteur
 
+## 🔧 Dépendances système
 
-# Linux
+- sqlite
+- python 3
 
-## :wrench: Dépendances système
+## 🔧 Lancer le bot en local
 
-- virtualenv
-- python3.5
-
-
-## :wrench: Installation du projet
-
+Cloner le dépôt distant :
 ```
-git clone https://github.com/UTBiscord/bot-discord.git
-cd bot-discord
+git clone https://github.com/TheRolfFR/TheBot
+```
 
-virtualenv --system-site-packages --python=python3 env
-source env/bin/activate
-
+Installer les modules python :
+```
 pip install -r requirements.txt
-
 ```
 
-## :wrench: Démarage du projet
-
+Ajouter un fichier token.txt à la racine avec le token du bot à l'intérieur.
+Vous avez généré ce token sur le portail [Discord developer].
+Vous pouvez créer une application en appuyant sur le bouton ``New application``.
+(https://discord.com/developers/applications) dans la section ``🧩 bot`` .
+Lancer le bot :
 ```
-source env/bin/activate
-python DISCORD_TOKER="entrez le token juste ici" bot.py
-
-```
-
-# Windows
-
-La version sans le support de la voix:
-```
-py -3-m pip install -U discord.py
-
-```
-La version avec le support de voix:
-
-```
-py -3-m pip install -U discord.py[voice] 
+python bot.py
 ```
 
-- plus d'info ici: https://pypi.org/project/discord.py/  
-- vidéo tutoriel (EN) : https://youtu.be/5yahh4tR0L0
+Évidemment il vous faudra inviter votre bot sur votre serveur. Pour cela récupérez le ``CLIENT ID`` dans la section ``🏠 General information``
+
+Maintenant si vous êtes administrateur de votre serveur, vous pouvez inviter le bot en tapant l'url:
+
+https://discord.com/api/oauth2/authorize?client_id=PASTE_CLIENT_ID_HERE&permissions=32630786&scope=bot
+
+Enjoy!
+
+
+## 🔧 Lancer le bot sur [repl.it](https://repl.it/) 🙊
+
+Demander à [TheRolfFR](https://bit.ly/therolf-github) aka Réseau
+
+## 📜 Informations et documentation
+
+- Librairie discord python (EN) : https://discordpy.readthedocs.io/en/latest/
+- Tutoriel vidéo créer un bot discord avec python (EN) : https://youtu.be/5yahh4tR0L0
