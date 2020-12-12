@@ -130,6 +130,7 @@ dmypy.json
 
 #vscode
 .vscode/
+.idea/
 
 # Custom
 token.txt
