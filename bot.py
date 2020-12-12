@@ -40,8 +40,8 @@ class UTBot (discord.Client):
 			text = BOT_COMMANDS[command].__doc__
 		return discord.Embed(title=f"Aide sur {command}", description=text.format(bot_prefix=self.prefix), color=color)
 
-		
-bot = UTBot(PREFIX)
+intents = discord.Intents(messages=True, guilds=True, members=True)	
+bot = UTBot(PREFIX, intents=intents)
 
 @bot.event
 async def on_ready():
