@@ -8,7 +8,11 @@ import io
 def _dict_to_csv_discord_file(dict, filename):
   result = []
   for key in dict.keys():
-    result.append([str(key), str(dict[key])])
+    if isinstance(dict[key], list):
+      for value in dict[key]:
+        result.append([str(key), str(value)])
+    else:
+      result.append([str(key), str(dict[key])])
 
   writer_file = io.StringIO()
   writer = csv.writer(writer_file, dialect='excel', delimiter=',')
@@ -110,15 +114,14 @@ async def cmd_roles(bot: discord.Client, message: discord.Message, command: str,
   # filter bots
   keys = list(membersRoles.keys())
   for r in keys:
-    if(len(membersRoles[r]) == 1 and r == membersRoles[r][0]):
+    if(len(membersRoles[r]) == 1 and membersRoles[r][0] == r):
       membersRoles.pop(r, None)
 
   resultEmbed = discord.Embed(title=f"Roles du serveur {guild.name}", value="Roles du serveur au " + datetime.now().strftime("%d/%m/%Y"), color=HELP_COLOR)
   resultEmbed.set_thumbnail(url=guild.icon_url)
 
-  for rankName in membersRoles.keys():
-    resultEmbed.add_field(name=rankName, value="​" + "\n".join(membersRoles[rankName]), inline=False)
-
+  for roleName in membersRoles.keys():
+    resultEmbed.add_field(name=roleName, value=str(len(membersRoles[roleName])))
   await message.channel.send(embed=resultEmbed, file=_dict_to_csv_discord_file(membersRoles, "roles"))
 
 async def cmd_ranks(bot: discord.Client, message: discord.Message, command: str, args: any):
@@ -160,10 +163,9 @@ async def cmd_ranks(bot: discord.Client, message: discord.Message, command: str,
     if(len(membersRanks[r]) == 1 and r == membersRanks[r][0]):
       membersRanks.pop(r, None)
 
-  resultEmbed = discord.Embed(title=f"Ranks du serveur {guild.name}", value="Ranks du serveur au " + datetime.now().strftime("%d/%m/%Y"), color=HELP_COLOR)
+  resultEmbed = discord.Embed(title=f"Ranks du serveur {guild.name}", value="Roles du serveur au " + datetime.now().strftime("%d/%m/%Y"), color=HELP_COLOR)
   resultEmbed.set_thumbnail(url=guild.icon_url)
 
-  for rankName in membersRanks.keys():
-    resultEmbed.add_field(name=f"{rankName} ({len(membersRanks[rankName])})", value="​" + "\n".join(membersRanks[rankName]), inline=False)
-
+  for roleName in membersRanks.keys():
+    resultEmbed.add_field(name=roleName, value=str(len(membersRanks[roleName])))
   await message.channel.send(embed=resultEmbed, file=_dict_to_csv_discord_file(membersRanks, "ranks"))
