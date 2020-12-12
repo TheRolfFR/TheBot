@@ -175,5 +175,5 @@ async def cmd_rageux(bot: discord.Client, message: discord.Message, command: str
   image.paste(textRotated, (0, 0), textRotated)
 
   await result.delete()
-  await message.channel.send(file=_image_to_discord_file(image))
+  await message.channel.send(f"{message.author.mention} dit:", file=_image_to_discord_file(image))
   return
