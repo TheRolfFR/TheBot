@@ -18,6 +18,7 @@ class UTBot (discord.Client):
 	
 	def run(self):
 		super().run(self.read_token())
+		keep_alive.stop()
 	
 	def read_token(self):
 		token = os.environ.get("DISCORD_TOKEN", "")
@@ -96,6 +97,6 @@ async def on_message_edit(before, after):
 	await on_message(after)
 
 # start the server to stay alive
-keep_alive.keep_alive()
+keep_alive.start()
 
 bot.run()

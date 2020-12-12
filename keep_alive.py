@@ -1,15 +1,34 @@
-from flask import Flask
-from threading import Thread
+import flask
+import threading
+from werkzeug.serving import make_server
 
-app = Flask('')
+app = flask.Flask('myapp')
+
+global server
+
+class ServerThread(threading.Thread):
+
+    def __init__(self, app):
+        threading.Thread.__init__(self)
+        self.srv = make_server('127.0.0.1', 8080, app)
+        self.ctx = app.app_context()
+        self.ctx.push()
+
+    def run(self):
+        self.srv.serve_forever()
+
+    def shutdown(self):
+        self.srv.shutdown()
+
+def start():
+    global server
+    server = ServerThread(app)
+    server.start()
+
+def stop():
+    global server
+    server.shutdown()
 
 @app.route('/')
 def main():
     return "Your bot is alive!"
-
-def run():
-    app.run(host="0.0.0.0", port=8080)
-
-def keep_alive():
-    server = Thread(target=run)
-    server.start()
