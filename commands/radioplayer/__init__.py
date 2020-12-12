@@ -75,8 +75,12 @@ class RadioPlayer:
         if not (self.vc is None) and self.vc.channel == user.voice.channel:
             self.vc.stop()
         else:
-            # firt deconnect
-            await disconnectVocal(bot, message, command, args, self.vc)
+            #try to get voice protocol and disconnect
+            if self.vc == None:
+                voice_protocol =  message.guild.voice_client
+
+                if voice_protocol is not None:
+                    voice_protocol.disconnect(force=True)
 
             # then reconnect
             self.vc = await voice_channel.connect()
