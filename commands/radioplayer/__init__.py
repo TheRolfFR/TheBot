@@ -69,55 +69,69 @@ class RadioPlayer:
             await error.delete()
             return
 
-        voice_channel = get_channel(bot, user.voice.channel.name)
+        bot_vc = self.getBotVoiceClient(message)
+        # if the bot is playing something
+        if bot_vc:
+            # then stop
+            bot_vc.stop()
 
-        # if the bot is playing something in the channel
-        if not (self.vc is None) and self.vc.channel == user.voice.channel:
-            self.vc.stop()
+            # if the bot is playing something in another channel
+            if bot_vc.channel != user.voice.channel:
+                bot_vc.move_to(user.voice.channel)
         else:
-            # firt deconnect
-            await disconnectVocal(bot, message, command, args, self.vc)
-
-            # then reconnect
-            self.vc = await voice_channel.connect()
-            self.voiceClientSessionID = self.vc.session_id
+            # connect
+            try:
+                bot_vc = await user.voice.channel.connect() # timeout=10
+            except TimeoutError as err:
+                await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, description="Timeout connexion"))
+                raise err
 
         # finally you can play
-        channel = voice_channel.name
+        channel_name = user.voice.channel.name
         await message.channel.send(
             embed=discord.Embed(
                 color=STATUS_COLOR,
                 description="Démarrage de la radio "
                 + radioName
                 + " dans le channel "
-                + channel
+                + channel_name
                 + "...",
             )
         )
         source = radioList.get(radioName)
-        print("Playing " + radioName + ": " + source + " in " + channel)
+        print("Playing " + radioName + ": " + source + " in " + channel_name)
 
-        self.vc.play(
+        bot_vc.play(
             discord.FFmpegPCMAudio(source=source)
         )
+
+        self.vc = bot_vc
+
+    def getBotVoiceClient(self, message):
+        if self.vc is not None:
+            return self.vc
+        else:
+            return message.guild.voice_client
 
     async def stopRadio(self, bot, message, command, args):
         """
     Usage : `{bot_prefix}stopRadio [...Disconnect=false]`
     Stop la radio
     """
+        # get bot voice client
+        bot_vc = self.getBotVoiceClient(message)
 
-        # disconnect when the it can
-        if not (self.vc is None):
-            await self.vc.disconnect()
-            self.voiceClientSessionID = 0
+        # disconnect of voice client
+        if bot_vc is not None:
+            await bot_vc.disconnect()
+            self.vc = None
+
             await message.channel.send(
                 embed=discord.Embed(
                     color=STATUS_COLOR,
-                    description="Bot déconnecté de " + self.vc.channel.name,
+                    description="Bot déconnecté de " + bot_vc.channel.name,
                 )
             )
-            self.vc = None
         else:
             await message.channel.send(
                 embed=discord.Embed(
