@@ -1,9 +1,8 @@
 discord.py[voice]
-googletrans
+googletrans==3.1.0a0
 black
 sqlalchemy
 Pillow
 PyNaCl
-discord.py[voice]
 requests
 flask
