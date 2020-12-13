@@ -10,7 +10,7 @@ class ServerThread(threading.Thread):
 
     def __init__(self, app):
         threading.Thread.__init__(self)
-        self.srv = make_server('127.0.0.1', 8080, app)
+        self.srv = make_server('0.0.0.0', 8080, app)
         self.ctx = app.app_context()
         self.ctx.push()
 
