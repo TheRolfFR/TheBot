@@ -38,7 +38,7 @@ async def cmd_stats(bot: discord.Client, message: discord.Message, command: str,
   resultEmbed.set_thumbnail(url=guild.icon_url)
 
   # add owner
-  resultEmbed.add_field(name="Propriétaire", value=guild.owner.nick, inline=False)
+  resultEmbed.add_field(name="Propriétaire", value=guild.owner.display_name, inline=False)
 
   # add creation date
   resultEmbed.add_field(name="Date de création", value=guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), inline=False)
