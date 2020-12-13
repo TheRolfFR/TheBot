@@ -3,12 +3,14 @@ import asyncio
 import os
 
 import discord
+import asyncio
+
 import googletrans
 
 import keep_alive
 
 from settings import *
-from commands import BOT_COMMANDS
+from commands import BOT_COMMANDS, laRadio
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -18,6 +20,18 @@ class UTBot (discord.Client):
 	
 	def run(self):
 		super().run(self.read_token())
+
+		print("-----------------------------")
+		print("Logout")
+		print("-----------------------------")
+
+		# when stoppped
+
+		# stop radio
+		for player in laRadio.players:
+			asyncio.run(player.stop())
+
+		# stop keep alive
 		keep_alive.stop()
 	
 	def read_token(self):
@@ -43,6 +57,7 @@ class UTBot (discord.Client):
 my_intents = discord.Intents.default()
 my_intents.guilds = True
 my_intents.members = True
+my_intents.voice_states = True
 bot = UTBot(PREFIX, intents=my_intents)
 
 @bot.event
@@ -97,6 +112,10 @@ async def on_message(message):
 @bot.event
 async def on_message_edit(before, after):
 	await on_message(after)
+
+@bot.event
+async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+	await laRadio.update(member, before, after)
 
 # start the server to stay alive
 keep_alive.start()

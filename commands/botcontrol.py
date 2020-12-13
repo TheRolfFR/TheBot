@@ -59,10 +59,6 @@ async def cmd_logout(bot, message, command, args):
     for index in range(len(bot.voice_clients)):
         vc = bot.voice_clients[index]
         await vc.disconnect()
-
-    print("-----------------------------")
-    print("Logout")
-    print("-----------------------------")
     jours, heures, minutes, secondes = convert_dhms(bot.uptime())
     alert = await message.channel.send(
         embed=discord.Embed(
