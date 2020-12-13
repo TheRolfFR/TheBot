@@ -10,19 +10,19 @@ from .stats import cmd_stats, cmd_ranks, cmd_roles
 laRadio = Radio()
 
 BOT_COMMANDS = {
-    "uptime": cmd_uptime,
-    "ping": cmd_ping,
-    "logout": cmd_logout,
-    "trad": cmd_trad,
-    "clear": cmd_clear,
+    "addrole": cmd_add_role,
     "addrank": cmd_add_rank,
+    "clear": cmd_clear,
+    "delrank": cmd_del_rank,
+    "logout": cmd_logout,
+    "ping": cmd_ping,
+    "radio": laRadio.cmd_radio,
+    "rageux": cmd_rageux,
     "rank": cmd_rank,
     "ranks": cmd_ranks,
-    "delrank": cmd_del_rank,
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
-    "addrole": cmd_add_role,
-    "rageux": cmd_rageux,
-    "radio": laRadio.cmd_radio,
-    "stats" : cmd_stats
+    "stats" : cmd_stats,
+    "trad": cmd_trad,
+    "uptime": cmd_uptime
 }
