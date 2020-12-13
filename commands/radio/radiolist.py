@@ -5,6 +5,7 @@ from .radiodescription import RadioDescription
 
 radioList = [
   RadioDescription(display_name='Autoroute Info', url='http://media.autorouteinfo.fr:8000/direct_nord.mp3', aliases=['AutorouteInfo', 'ai']),
+  RadioDescription(display_name='Beur FM', url='http://beurfm.ice.infomaniak.ch/beurfm-high.mp3', aliases=['beurfm']),
   RadioDescription(display_name='BFM Business', url='http://chai5she.cdn.dvmr.fr/bfmbusiness', aliases=['BFMBusiness', 'bfmb']),
   RadioDescription(display_name='Classic FM', url='http://media-ice.musicradio.com/ClassicFMMP3', aliases=['ClassicFM', 'cfm']),
   RadioDescription(display_name='France Culture', url='http://icecast.radiofrance.fr/franceculture-midfi.mp3', aliases=['FranceCulture', 'fc']),
@@ -21,5 +22,6 @@ radioList = [
   RadioDescription(display_name='Rire Et Chansons', url='http://185.52.127.168/fr/30401/mp3_128.mp3', aliases=['RireEtChansons', 'rec']),
   RadioDescription(display_name='RTL', url='http://streaming.radio.rtl.fr/rtl-1-44-128', aliases=['RTL']),
   RadioDescription(display_name='RTL2', url='http://streaming.radio.rtl2.fr/rtl2-1-44-128', aliases=['RTL2']),
-  RadioDescription(display_name='Skyrock', url='http://icecast.skyrock.net/s/natio_mp3_128k', aliases=['Skyrock', 's'])
+  RadioDescription(display_name='Skyrock', url='http://icecast.skyrock.net/s/natio_mp3_128k', aliases=['Skyrock', 's']),
+  RadioDescription(display_name='Virgin Radio', url='http://ais-live.cloud-services.paris:8000/virgin.mp3', aliases=['VirginRadio', 'Virgin'])
 ]
