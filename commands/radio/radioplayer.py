@@ -17,7 +17,7 @@ class RadioPlayer:
     """Connect or move to another channel"""
 
     # connect if no voice channel
-    if self.vc is None:
+    if self.vc is None or channel.guild.voice_client is None:
       self.vc = await channel.connect() # timeout=10
     else:
       # else check if not good channel then move
