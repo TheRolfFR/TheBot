@@ -5,7 +5,16 @@ from settings import *
 
 from .radiodescription import RadioDescription
 from .radioplayer import RadioPlayer
-from .radiolist import radioList
+from os.path import join, dirname
+
+RADIO_LIST_PATH = join(dirname(__file__), 'radiolist.py')
+
+def get_radio_list():
+    """Dynamically imports radio list"""
+
+    exec(open(RADIO_LIST_PATH).read())
+
+    return locals()['radioList']
 
 class Radio:
     """Radio command"""
@@ -14,10 +23,13 @@ class Radio:
     def find_radio(self, alias: str):
         """Find radio description if"""
 
+        # hot loading
+        radioList = get_radio_list()
+
         result = None
         i = 0
         while i < len(radioList) and result is None:
-            if radioList[i].display_name == alias or alias in radioList[i].aliases:
+            if radioList[i] == alias:
                 result = radioList[i]
             
             i += 1
@@ -53,6 +65,10 @@ class Radio:
         """
         if not args: # if no args list radios
             theList = "**Liste des radios :**"
+
+            # hot loading
+            radioList = get_radio_list()
+
             for radio in radioList:
                 theList += f'\n{str(radio)}'
             await message.channel.send(theList)

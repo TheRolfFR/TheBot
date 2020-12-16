@@ -4,16 +4,23 @@ class RadioDescription:
   aliases: list
 
   def __init__(self, display_name: str, url: str, aliases: list):
-    self.display_name = display_name
-    self.url = url
-    self.aliases =  [x.lower() for x in aliases]
+    self.display_name = str(display_name)
+    self.url = str(url)
+    self.aliases =  [str(x).lower() for x in aliases]
 
   def __eq__(self, o):
     """== operator overload"""
+
+    # compare fields if string, can be used for search
+    if isinstance(o, str):
+      return o == self.url or o == self.display_name or o in self.aliases
+
+    # else if not radio description don't even try
     if not isinstance(o, RadioDescription):
-      return False
+      raise NotImplementedError("Cannot compare RadioDescription with " + type(o).__name__)
       
-    return str(self.url) == str(o.url) and str(self.display_name) == str(o.display_name)
+    # compare strictly all the fields
+    return self.url == o.url and self.display_name == o.display_name
 
   def __ne__(self, o):
     """!= oeprator overload"""
