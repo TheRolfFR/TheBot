@@ -169,6 +169,8 @@ class Radio:
 
             # play radio
             await player.play(radio_desc)
+
+            await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de ${player.radio.display_name} dans ${ player.channel_name() }...'))
     
     async def update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         # check if not joined
