@@ -11,6 +11,7 @@ import keep_alive
 
 from settings import *
 from commands import BOT_COMMANDS, laRadio
+from commands.mod import cmd_hardlog_update
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -112,10 +113,27 @@ async def on_message(message):
 @bot.event
 async def on_message_edit(before, after):
 	await on_message(after)
+	await cmd_hardlog_update(
+		bot=bot,
+		message_original=before,
+		message_edite=after,
+		edit=True,
+		delete=False
+	)
 
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
 	await laRadio.update(member, before, after)
+
+@bot.event
+async def on_message_delete(message: discord.Message):
+	await cmd_hardlog_update(
+		bot=bot,
+		message_original=message,
+		message_edite=None,
+		edit=False,
+		delete=True
+	)
 
 # start the server to stay alive
 keep_alive.start()
