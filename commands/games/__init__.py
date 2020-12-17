@@ -150,10 +150,11 @@ async def cmd_jump_top(bot: discord.Client, message: discord.Message, command: s
             finalString += str(topListSorted[i][1]) + " pt" + ("s" if topListSorted[i][1] > 1 else "") + " : " + guild.get_member(int(topListSorted[i][0])).display_name + "\n"
 
     # your rank
-    authorRank = ([idx for idx, key in enumerate(topListSorted) if key[0] == author_id])[0] # index
-
-    if authorRank >= JUMP_TOP_DISPLAY:
-        finalString += "...\n" + str(topListSorted[authorRank][1]) + " pt" + ("s" if topListSorted[authorRank][1] > 1 else "") + " : " + guild.get_member(int(topListSorted[authorRank][0])).display_name
+    authorRankList = [idx for idx, key in enumerate(topListSorted) if key[0] == author_id]
+    
+    # authorRank = authorRankList[0] # index
+    if len(authorRankList) and authorRankList[0] >= JUMP_TOP_DISPLAY:
+        finalString += "...\n" + str(topListSorted[authorRankList[0]][1]) + " pt" + ("s" if topListSorted[authorRankList[0]][1] > 1 else "") + " : " + guild.get_member(int(topListSorted[authorRankList[0]][0])).display_name
 
     if(len(finalString)):
         resultEmbed.add_field(name="Suite top " + str(JUMP_TOP_DISPLAY), value=finalString, inline=False)
