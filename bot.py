@@ -12,6 +12,7 @@ import keep_alive
 from settings import *
 from commands import BOT_COMMANDS, laRadio
 from commands.mod import cmd_hardlog_update
+from commands.vocal import cmd_instant_vocal_update
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -124,6 +125,7 @@ async def on_message_edit(before, after):
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
 	await laRadio.update(member, before, after)
+	await cmd_instant_vocal_update(member, before, after)
 
 @bot.event
 async def on_message_delete(message: discord.Message):
