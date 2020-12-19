@@ -76,6 +76,9 @@ class GuildSettingGroup:
 
     self.raw = get_setting(guild_id, field)
 
+    if self.raw is None:
+      self.raw = {}
+
   @property
   def field(self):
     """Key of the setting"""
@@ -126,6 +129,9 @@ class GuildSettingItem:
     self.__type = item_type
     self.__default = default
 
+    if not key in self.__group.raw:
+      self.__group.raw[key] = self.__default
+
   @property
   def key(self):
     """Key of the setting"""
@@ -145,7 +151,7 @@ class GuildSettingItem:
 
   @value.setter
   def value(self, value: any):
-    if not isinstance(self.__group.raw[self.__key], self.__type):
+    if not isinstance(value, self.__type):
       raise TypeError(f'Incorrect type, expected { self.__type }, got { type(value) }')
 
     self.__group.raw[self.__key] = value

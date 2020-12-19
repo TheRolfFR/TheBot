@@ -89,6 +89,7 @@ async def cmd_hardlog(bot: discord.Client, message: discord.Message, command: st
     else:
       state = True if args[0] == 'enable' else False
       guild_hardlog_settings.items[HARDLOG_KEY_ENABLED].value = state
+      guild_hardlog_settings.save()
 
     await message.channel.send(embed=discord.Embed(
       title=":notepad_spiral: Hardlog",
@@ -108,8 +109,10 @@ async def cmd_hardlog(bot: discord.Client, message: discord.Message, command: st
 
     if args[1] == 'edit':
       guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_EDIT].value = state
+      guild_hardlog_settings.save()
     else:
       guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_DELETE].value = state
+      guild_hardlog_settings.save()
 
     await message.channel.send(embed=discord.Embed(
       title=":notepad_spiral: Hardlog",
