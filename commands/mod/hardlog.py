@@ -119,6 +119,10 @@ async def cmd_hardlog(bot: discord.Client, message: discord.Message, command: st
   if len(args) <= 0:
     return
 
+  # message must not be posted by bot
+  if message.author.bot:
+    return
+
   # you gotta be an admin
   if not message.author.guild_permissions.administrator:
     await message.channel.send(embed=discord.Embed(
@@ -180,6 +184,10 @@ async def cmd_hardlog_update(bot: discord.Client ,message_original: discord.Mess
 
   # this is a guild message listener
   if guild is None:
+    return
+  
+  # message must not be posted by bot
+  if message_original.author.bot:
     return
 
   guild_id = guild.id
