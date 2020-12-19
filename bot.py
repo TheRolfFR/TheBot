@@ -140,6 +140,7 @@ keep_alive.start()
 
 bot.run()
 
-#permission number 301067350
+# permission integer: 301067378
+# permission integer 8 is administrator
 # invite link be like https://discord.com/oauth2/authorize?client_id=<client_id>&permissions=<permission_number>&scope=bot
-# invite link be like https://discord.com/oauth2/authorize?client_id=<client_id>&permissions=301067350&scope=bot
+# invite link be like https://discord.com/oauth2/authorize?client_id=<client_id>&permissions=301067378&scope=bot
