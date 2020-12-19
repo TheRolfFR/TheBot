@@ -60,3 +60,92 @@ def set_setting(guild_id: int, field: str, value: any):
     print("Error while writing settings file")
     print(e)
     return
+
+class GuildSettingGroup:
+  """Guild setting group with key and items"""
+  __guild_id: int
+  __field: str
+  items: list
+  raw: any
+
+  def __init__(self, guild_id: int, field: str):
+    self.__field = field
+    self.__guild_id = guild_id
+
+    self.items = {}
+
+    self.raw = get_setting(guild_id, field)
+
+  @property
+  def field(self):
+    """Key of the setting"""
+    return self.__field
+
+  @field.setter
+  def field(self, val):
+    return
+
+  @property
+  def guild_id(self):
+    """Guild ID of the setting"""
+    return self.__guild_id
+
+  @guild_id.setter
+  def guild_id(self, val):
+    return
+
+  def create_item(self, key: str, item_type: type, default:any=None):
+    """Get or create an item of the group"""
+    if key not in self.items:
+      self.items[key] = GuildSettingItem(self, key, item_type, default)
+    
+    return self.items[key]
+  
+  def save(self):
+    set_setting(self.__guild_id, self.__field, self.raw)
+
+  def __eq__(self, o):
+    """== operator overload"""
+    if isinstance(o, int):
+      return o == self.__guild_id
+
+    return False
+
+class GuildSettingItem:
+  """Guild setting item interface with key, type and optional default value"""
+  __group: GuildSettingGroup
+
+  __key: str
+  __type: type
+  __default: any
+
+  def __init__(self, group: GuildSettingGroup, key: str, item_type: type, default:any=None):
+    self.__group = group
+
+    self.__key = key
+    self.__type = item_type
+    self.__default = default
+
+  @property
+  def key(self):
+    """Key of the setting"""
+    return self.__key
+
+  @key.setter
+  def key(self, val):
+    return
+  
+  @property
+  def value(self):
+    """Value of the setting"""
+    if self.__key in self.__group.raw and isinstance(self.__group.raw[self.__key], self.__type):
+      return self.__group.raw[self.__key]
+    
+    return self.__default
+
+  @value.setter
+  def value(self, value: any):
+    if not isinstance(self.__group.raw[self.__key], self.__type):
+      raise TypeError(f'Incorrect type, expected { self.__type }, got { type(value) }')
+
+    self.__group.raw[self.__key] = value

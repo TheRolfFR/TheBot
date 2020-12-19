@@ -19,75 +19,17 @@ HARDLOG_KEY_ENABLED_EDIT = 'enabled_edit'
 HARDLOG_KEY_ENABLED_EDIT_DEFAULT_VALUE = True
 
 HARDLOG_DEFAULT_VALUE_ENABLED = True
-class HardlogSettings:
-  guild_id: int
-  channel_id: int
-  enabled: bool
-  enabled_delete: bool
-  enabled_edit: bool
 
+class HardlogSettings(guild_settings.GuildSettingGroup):
   """Class used to store hardlog settings"""
+
   def __init__(self, guild_id: int):
-    # save guild_id
-    self.guild_id = guild_id
+    super().__init__(guild_id, HARDLOG_KEY)
 
-    # get settings
-    hardlog_settings = guild_settings.get_setting(guild_id, HARDLOG_KEY)
-
-    if hardlog_settings is None or not isinstance(hardlog_settings, dict):
-      hardlog_settings = {}
-
-    if HARDLOG_KEY_CHANNEL_ID in hardlog_settings:
-      self.channel_id = hardlog_settings[HARDLOG_KEY_CHANNEL_ID]
-    else:
-      self.channel_id = HARDLOG_KEY_CHANNEL_ID_DEFAULT_VALUE
-
-    if HARDLOG_KEY_ENABLED in hardlog_settings:
-      self.enabled = hardlog_settings[HARDLOG_KEY_ENABLED]
-    else:
-      self.enabled = HARDLOG_KEY_ENABLED_DEFAULT_VALUE
-
-    if HARDLOG_KEY_ENABLED_DELETE in hardlog_settings:
-      self.enabled_delete = hardlog_settings[HARDLOG_KEY_ENABLED_DELETE]
-    else:
-      self.enabled_delete = HARDLOG_KEY_ENABLED_DELETE_DEFAULT_VALUE
-
-    if HARDLOG_KEY_ENABLED_EDIT in hardlog_settings:
-      self.enabled_edit = hardlog_settings[HARDLOG_KEY_ENABLED_EDIT]
-    else:
-      self.enabled_edit = HARDLOG_KEY_ENABLED_EDIT_DEFAULT_VALUE
-
-  def save(self):
-    hardlog_settings = {}
-    hardlog_settings[HARDLOG_KEY_CHANNEL_ID] = self.channel_id
-    hardlog_settings[HARDLOG_KEY_ENABLED] = self.enabled
-    hardlog_settings[HARDLOG_KEY_ENABLED_DELETE] = self.enabled_delete
-    hardlog_settings[HARDLOG_KEY_ENABLED_EDIT] = self.enabled_edit
-    
-    guild_settings.set_setting(self.guild_id, HARDLOG_KEY, hardlog_settings)
-  
-  def enable(self, state: bool):
-    self.enabled = state
-    self.save()
-
-  def enable_delete(self, state: bool):
-    self.enabled_delete = state
-    self.save()
-
-  def enable_edit(self, state: bool):
-    self.enabled_edit = state
-    self.save()
-
-  def here(self, channel_id: int):
-    self.channel_id = channel_id
-    self.save()
-
-  def __eq__(self, o):
-    """== operator overload"""
-    if isinstance(o, int):
-      return o == self.guild_id
-
-    return False
+    super().create_item(HARDLOG_KEY_CHANNEL_ID, int, HARDLOG_KEY_CHANNEL_ID_DEFAULT_VALUE)
+    super().create_item(HARDLOG_KEY_ENABLED, bool, HARDLOG_KEY_ENABLED_DEFAULT_VALUE)
+    super().create_item(HARDLOG_KEY_ENABLED_EDIT, bool, HARDLOG_KEY_ENABLED_EDIT_DEFAULT_VALUE)
+    super().create_item(HARDLOG_KEY_ENABLED_DELETE, bool, HARDLOG_KEY_ENABLED_DELETE_DEFAULT_VALUE)
 
 hardlog_settings_list = []
 
@@ -143,10 +85,10 @@ async def cmd_hardlog(bot: discord.Client, message: discord.Message, command: st
     cmd = args[0]
 
     if cmd == 'here':
-      guild_hardlog_settings.here(message.channel.id)
+      guild_hardlog_settings.items[HARDLOG_KEY_CHANNEL_ID].value = message.channel.id
     else:
       state = True if args[0] == 'enable' else False
-      guild_hardlog_settings.enable(state)
+      guild_hardlog_settings.items[HARDLOG_KEY_ENABLED].value = state
 
     await message.channel.send(embed=discord.Embed(
       title=":notepad_spiral: Hardlog",
@@ -165,9 +107,9 @@ async def cmd_hardlog(bot: discord.Client, message: discord.Message, command: st
     state = True if args[0] == 'enable' else False
 
     if args[1] == 'edit':
-      guild_hardlog_settings.enable_edit(state)
+      guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_EDIT].value = state
     else:
-      guild_hardlog_settings.enable_delete(state)
+      guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_DELETE].value = state
 
     await message.channel.send(embed=discord.Embed(
       title=":notepad_spiral: Hardlog",
@@ -199,24 +141,26 @@ async def cmd_hardlog_update(bot: discord.Client ,message_original: discord.Mess
   guild_hardlog_settings = get_hardlog_settings(guild_id)
 
   # if no channel defined then no thanks
-  if guild_hardlog_settings.channel_id is None:
+  if guild_hardlog_settings.items[HARDLOG_KEY_CHANNEL_ID].value is None:
     return
 
+  channel_id = guild_hardlog_settings.items[HARDLOG_KEY_CHANNEL_ID].value
+
   # get the channel now ?
-  hardlog_channel = bot.get_channel(guild_hardlog_settings.channel_id)
+  hardlog_channel = bot.get_channel(channel_id)
 
   # get out if this channel doesn't exist
   if hardlog_channel is None:
     return
 
   # do it only if enabled
-  if not guild_hardlog_settings.enabled:
+  if not guild_hardlog_settings.items[HARDLOG_KEY_ENABLED].value:
     return
 
-  if delete == True and not guild_hardlog_settings.enabled_delete:
+  if delete == True and not guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_DELETE].value:
     return
 
-  if edit == True and not guild_hardlog_settings.enabled_edit:
+  if edit == True and not guild_hardlog_settings.items[HARDLOG_KEY_ENABLED_EDIT].value:
     return
 
   status = "Supprimé" if delete == True else "Édité"
