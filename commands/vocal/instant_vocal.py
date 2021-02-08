@@ -292,7 +292,7 @@ async def cmd_instant_vocal(bot: discord.Client, message: discord.Message, comma
     for member in message.mentions:
       iv.invite(member)
       try:
-        member.move_to(my_voice_channel)
+        await member.move_to(my_voice_channel)
       except:
         pass
 
