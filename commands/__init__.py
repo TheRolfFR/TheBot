@@ -2,7 +2,6 @@ from .botcontrol import cmd_uptime, cmd_ping, cmd_logout
 from .translate import cmd_trad
 from .moderation import cmd_clear
 from .rank import cmd_add_rank, cmd_del_rank, cmd_add_role, cmd_role_info, cmd_rank
-from .rageux import cmd_rageux
 from .radio import Radio
 from .rank import *
 from .stats import cmd_stats, cmd_ranks, cmd_roles
@@ -22,7 +21,6 @@ BOT_COMMANDS = {
     "logout": cmd_logout,
     "ping": cmd_ping,
     "radio": laRadio.cmd_radio,
-    "rageux": cmd_rageux,
     "rank": cmd_rank,
     "ranks": cmd_ranks,
     "roles": cmd_roles,

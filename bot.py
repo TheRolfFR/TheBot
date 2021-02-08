@@ -83,14 +83,22 @@ async def cmd_help(bot, message, command, args):
 	Donne de l’aide sur une commande
 	"""
 	if len(args) == 0:
-		await message.channel.send(embed=discord.Embed(color=HELP_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys())) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
+		commandlist = list(BOT_COMMANDS.keys())
+		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
+			commandlist.append("rageux")
+		await message.channel.send(embed=discord.Embed(color=HELP_COLOR, title="Liste des commandes", description="\n".join(list(commandlist)) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
 	elif len(args) > 1:
 		await message.channel.send(embed=bot.doc_embed("help", ERROR_COLOR))
-	elif args[0] in BOT_COMMANDS.keys() or args[0] == "help":
-		await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
 	else:
-		await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, description=f"La commande {args[0]} est inconnue"))
-		await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys()))))
+		commandlist = list(BOT_COMMANDS.keys())
+		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
+			commandlist.append("rageux")
+		
+		if args[0] in commandlist or args[0] == "help":
+			await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
+		else:
+			await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, description=f"La commande {args[0]} est inconnue"))
+			await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys()))))
 
 
 @bot.event
@@ -105,7 +113,11 @@ async def on_message(message):
 		
 		if command == "help":
 			await cmd_help(bot, message, command, args)
-		if command in BOT_COMMANDS.keys():
+
+		if (message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602) and command == "rageux":
+			from commands.rageux import cmd_rageux
+			await cmd_rageux(bot, message, command, args)
+		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)
 			
 			
