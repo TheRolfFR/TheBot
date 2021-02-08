@@ -12,6 +12,7 @@ import keep_alive
 from settings import *
 from commands import BOT_COMMANDS, laRadio
 from commands.mod import cmd_hardlog_update
+from commands.rageux import cmd_rageux
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -51,6 +52,8 @@ class UTBot (discord.Client):
 	def doc_embed(self, command, color):
 		if command == "help":
 			text = cmd_help.__doc__
+		elif command == "rageux":
+			text = cmd_rageux.__doc__
 		else:
 			text = BOT_COMMANDS[command].__doc__
 		return discord.Embed(title=f"Aide sur {command}", description=text.format(bot_prefix=self.prefix), color=color)
@@ -86,6 +89,7 @@ async def cmd_help(bot, message, command, args):
 		commandlist = list(BOT_COMMANDS.keys())
 		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
 			commandlist.append("rageux")
+			commandlist.sort()
 		await message.channel.send(embed=discord.Embed(color=HELP_COLOR, title="Liste des commandes", description="\n".join(list(commandlist)) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
 	elif len(args) > 1:
 		await message.channel.send(embed=bot.doc_embed("help", ERROR_COLOR))
@@ -93,6 +97,7 @@ async def cmd_help(bot, message, command, args):
 		commandlist = list(BOT_COMMANDS.keys())
 		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
 			commandlist.append("rageux")
+			commandlist.sort()
 		
 		if args[0] in commandlist or args[0] == "help":
 			await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
@@ -115,7 +120,6 @@ async def on_message(message):
 			await cmd_help(bot, message, command, args)
 
 		if (message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602) and command == "rageux":
-			from commands.rageux import cmd_rageux
 			await cmd_rageux(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)
