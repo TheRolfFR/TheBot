@@ -62,6 +62,7 @@ class Radio:
         `{bot_prefix}radio pause`: met en pause la radio
         `{bot_prefix}radio resume` : rejoue la radio
         `{bot_prefix}radio stop` : stop la radio
+        `{bot_prefix}radio volume <volume [0:100]>` : Change le volume de la radio
         """
         if not args: # if no args list radios
             theList = "**Liste des radios :**"
@@ -131,46 +132,65 @@ class Radio:
             #exit da fuck outa here
             return
 
-        if isinstance(args, list) and len(args) == 2 and args[0] == 'play': # play a radio
-            # get radio alias
-            alias = str(args[1])
+        if isinstance(args, list) and len(args) == 2:
+            if args[0] == 'play': # play a radio
+                # get radio alias
+                alias = str(args[1])
 
-            # search for radio
-            radio_desc = self.find_radio(alias)
+                # search for radio
+                radio_desc = self.find_radio(alias)
 
-            if not isinstance(radio_desc, RadioDescription):
-                await message.channel.send(
-                    embed=discord.Embed(
-                        title="Nom de radio incorrect",
-                        color=ERROR_COLOR,
-                        description= f"{ message.author.mention }, impossible de trouver la radio {alias}"
+                if not isinstance(radio_desc, RadioDescription):
+                    await message.channel.send(
+                        embed=discord.Embed(
+                            title="Nom de radio incorrect",
+                            color=ERROR_COLOR,
+                            description= f"{ message.author.mention }, impossible de trouver la radio {alias}"
+                        )
                     )
-                )
-                await self.cmd_radio(bot, message, command, [])
-                return
+                    await self.cmd_radio(bot, message, command, [])
+                    return
 
-            # exit if user not in voice channel
-            if not message.author.voice:
-                error = await message.channel.send(
-                    embed=discord.Embed(
-                        color=ERROR_COLOR,
-                        description=message.author.mention + ", tu n'es pas dans un channel audio.",
+                # exit if user not in voice channel
+                if not message.author.voice:
+                    error = await message.channel.send(
+                        embed=discord.Embed(
+                            color=ERROR_COLOR,
+                            description=message.author.mention + ", tu n'es pas dans un channel audio.",
+                        )
                     )
-                )
-                await asyncio.sleep(2)
-                await error.delete()
-                return
+                    await asyncio.sleep(2)
+                    await error.delete()
+                    return
 
-            # get player
-            player = self.get_player(message.guild)
+                # get player
+                player = self.get_player(message.guild)
 
-            # go to voice channel
-            await player.go_to(message.author.voice.channel)
+                # go to voice channel
+                await player.go_to(message.author.voice.channel)
 
-            # play radio
-            await player.play(radio_desc)
+                # play radio
+                await player.play(radio_desc)
 
-            await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de ${player.radio.display_name} dans ${ player.channel_name() }...'))
+                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de ${player.radio.display_name} dans ${ player.channel_name() }...'))
+            elif args[0] == "volume":
+                # get player
+                player = self.get_player(message.guild)
+
+                changed = player.setVolume(args[1])
+
+                if not changed:
+                    error = await message.channel.send(
+                        embed=discord.Embed(
+                            color=ERROR_COLOR,
+                            description="Impossible de lire la valeur du volume, merci de choisir un réel entre 0 et 100 inclus",
+                        )
+                    )
+                    await asyncio.sleep(2)
+                    await error.delete()
+                    return
+
+                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f':speaker: Changement du volume de la radio à { player.volume } %'))
     
     async def update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         # check if not joined

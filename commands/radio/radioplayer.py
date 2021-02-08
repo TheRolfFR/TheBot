@@ -12,6 +12,7 @@ class RadioPlayer:
 
   def __init__(self, guild: discord.Guild):
     self.guild = guild
+    self.volume = 100
   
   async def go_to(self, channel: discord.VoiceChannel):
     """Connect or move to another channel"""
@@ -38,7 +39,23 @@ class RadioPlayer:
 
       # replay
       self.vc.play(discord.FFmpegPCMAudio(source=self.radio.url))
+      self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
     return
+
+  def setVolume(self, volume):
+    """Changes radio volume"""
+    try:
+      val = float(volume)
+
+      if val < 0.0 or val > 100.0:
+        return False
+    except:
+      return False
+
+    self.volume = val
+    self.vc.source.volume = self.volume / 100.0
+
+    return True
   
   def pause(self):
     """Pause play of radio"""
