@@ -1,4 +1,4 @@
-PREFIX = "="
+PREFIX = "thebot/"
 
 HELP_COLOR = 0x55AAFF
 ERROR_COLOR = 0xFF4406

@@ -76,7 +76,7 @@ async def on_ready():
 	print("-----------------------------")
 	await asyncio.sleep(4)
 	bot.launchtime = time.time()
-	await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Opérationnel !"))
+	await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=f'{ bot.prefix }help'))
 	
 
 
@@ -112,7 +112,7 @@ async def on_message(message):
 	
 	if message.content.startswith(bot.prefix):  # Filtre les commandes d’entrée
 		# Découpage de la commande `<prefixe><commande> <arg1> <arg2> …`
-		commandtokens = message.content.strip().lstrip(bot.prefix).split(" ")
+		commandtokens = message.content[len(bot.prefix):].split(" ")
 		command = commandtokens[0]
 		args = commandtokens[1:]
 		
