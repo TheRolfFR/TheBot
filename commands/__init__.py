@@ -7,6 +7,7 @@ from .rank import *
 from .stats import cmd_stats, cmd_ranks, cmd_roles
 from .games import *
 from .mod import cmd_hardlog
+from .rename import cmd_rename
 
 laRadio = Radio()
 
@@ -23,6 +24,7 @@ BOT_COMMANDS = {
     "radio": laRadio.cmd_radio,
     "rank": cmd_rank,
     "ranks": cmd_ranks,
+    "rename": cmd_rename,
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
     "stats" : cmd_stats,
