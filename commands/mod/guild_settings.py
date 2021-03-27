@@ -114,6 +114,12 @@ class GuildSettingGroup:
 
     return False
 
+  def __str__(self):
+    return self.raw
+
+  def __repr__(self):
+    return self.__str__()
+
 class GuildSettingItem:
   """Guild setting item interface with key, type and optional default value"""
   __group: GuildSettingGroup
@@ -155,3 +161,9 @@ class GuildSettingItem:
       raise TypeError(f'Incorrect type, expected { self.__type }, got { type(value) }')
 
     self.__group.raw[self.__key] = value
+  
+  def __str__(self):
+    return str(self.value)
+
+  def __repr__(self):
+    return self.__str__()
