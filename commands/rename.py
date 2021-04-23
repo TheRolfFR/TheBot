@@ -164,6 +164,14 @@ async def cmd_rename(bot: discord.Client, message: discord.Message, command: str
     return
   
   # else set command
+  if not message.author.guild_permissions.administrator:
+    await message.channel.send(embed=discord.Embed(
+      title=":notepad_spiral: Hardlog",
+      color=ERROR_COLOR,
+      description=":x: vous n'avez pas la permission de faire ça, vous devez être admin :x:"
+    ))
+    return
+
   getRenameSettings(message)
   print(arr[INDEX_SET].groups())
   renameEnableItem.value[str(foundChannel.id)] = arr[INDEX_SET].group(2) == "1"
