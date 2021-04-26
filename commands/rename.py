@@ -107,7 +107,7 @@ async def cmd_rename(bot: discord.Client, message: discord.Message, command: str
       await asyncio.sleep(2)
       await error.delete()
       raise e
-      return
+    return
 
   # else I need to find the channel by its name
   channelList = message.guild.voice_channels
@@ -166,7 +166,7 @@ async def cmd_rename(bot: discord.Client, message: discord.Message, command: str
   # else set command
   if not message.author.guild_permissions.administrator:
     await message.channel.send(embed=discord.Embed(
-      title=":notepad_spiral: Hardlog",
+      title=":speaker: Rename channel",
       color=ERROR_COLOR,
       description=":x: vous n'avez pas la permission de faire ça, vous devez être admin :x:"
     ))
