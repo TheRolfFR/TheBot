@@ -137,7 +137,10 @@ async def cmd_jump_top(bot: discord.Client, message: discord.Message, command: s
     
     for i , top_value in enumerate(topListSorted[:JUMP_TOP_DISPLAY]) :
         if i > 2:
-            finalString += str(topListSorted[i][1]) + " pt" + ("s" if topListSorted[i][1] > 1 else "") + " : " + guild.get_member(int(topListSorted[i][0])).display_name + "\n"
+            member = guild.get_member(int(topListSorted[i][0]))
+            member_name = "Unknown" if member is None else member.display_name
+            member_name = member.name if member_name is None else member_name
+            finalString += str(topListSorted[i][1]) + " pt" + ("s" if topListSorted[i][1] > 1 else "") + " : " + member_name + "\n"
 
     # your rank
     authorRankList = [idx for idx, key in enumerate(topListSorted) if key[0] == author_id]
