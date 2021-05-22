@@ -45,6 +45,14 @@ async def cmd_rename(bot: discord.Client, message: discord.Message, command: str
   `{bot_prefix}rename set "<channel>" <0|1>` : autorise ou non le renommage de channel vocal du nom donné
   `{bot_prefix}rename original "<channel>"` : met à jour le nom original du channel (remis quand plus personne dans le channel)
   """
+  await message.channel.send(
+    embed=discord.Embed(
+        color=ERROR_COLOR,
+        description=message.author.mention + "Command broken. Will be soon fixed",
+    )
+  )
+  return
+
   argstring = " ".join(args)
 
   arr = [
