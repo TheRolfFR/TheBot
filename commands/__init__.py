@@ -8,6 +8,7 @@ from .stats import cmd_stats, cmd_ranks, cmd_roles
 from .games import *
 from .mod import cmd_hardlog
 from .rename import cmd_rename
+from .larousse import cmd_larousse
 
 laRadio = Radio()
 
@@ -19,6 +20,7 @@ BOT_COMMANDS = {
     "hardlog": cmd_hardlog,
     "jump": cmd_jump,
     "jumptop": cmd_jump_top,
+    "larousse": cmd_larousse,
     "logout": cmd_logout,
     "ping": cmd_ping,
     "radio": laRadio.cmd_radio,
