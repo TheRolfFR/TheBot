@@ -82,10 +82,14 @@ async def cmd_larousse(bot: discord.Client, message: discord.Message, command: s
       cap_temp_list = [c for c in mots[0] if c.isupper()]
       if len(cap_temp_list) > 1:
         capital_pos = mots[0].index(cap_temp_list[1])
-        mots[0] = str(mots[0][:capital_pos]) + ' - ' + str(mots[0][capital_pos:])
+        if(capital_pos > 2):
+          mots[0] = str(mots[0][:capital_pos]) + ' - ' + str(mots[0][capital_pos:])
 
       phrase = " ".join(mots) # on recree la phrase
 
+      if(len(content + "\n• " + phrase) > 2000):
+        await message.reply(content)
+        content = ""
       content += "\n• " + phrase #autres tirets
 
     await message.reply(content)
