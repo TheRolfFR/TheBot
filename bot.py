@@ -123,6 +123,27 @@ async def on_message(message):
 			await cmd_rageux(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)
+		elif "\n" in command:
+			# try \n bug fix
+
+			print(commandtokens)
+
+			firstindex = command.find("\n")
+
+			#rebuild commands
+			cmd = command[:firstindex]
+
+			if isinstance(args, str):
+				args = [args]
+
+			args = [command[(firstindex+1):]] + args
+			
+			# replace new command
+			command = cmd
+
+			print(command, args)
+			if command in BOT_COMMANDS.keys():
+				await BOT_COMMANDS[command](bot, message, command, args)
 			
 			
 
