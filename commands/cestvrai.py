@@ -122,15 +122,48 @@ def openImageFromURL(url):
   response = requests.get(url)
   return Image.open(BytesIO(response.content))
 
+regexp_url = re.compile(
+  r'^(?:http|ftp)s?://' # http:// or https://
+  r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+  r'localhost|' #localhost...
+  r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+  r'(?::\d+)?' # optional port
+  r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
 async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: str, args):
   """Commande meme c'est vrai: `{bot_prefix}cvrai <message d'explication (optionnel)>` + pièce jointe avec image: Affiche l'image dans un cadre avec le message d'explication"""
 
+  url_provided = False
+  url_gif = None
+
+  print(args)
+
+  #determine attachment url
+  sentence = " "
+  if(isinstance(args, list)):
+    url_provided = len(args) > 0 and re.match(regexp_url, args[0]) is not None
+
+    if(url_provided):
+      url_gif = args[0]
+      sentence = " ".join(args[1:])
+    else:
+      sentence = " ".join(args)
+  elif(isinstance(args, str)):
+    url_provided = re.match(regexp_url, args[0]) is not None
+
+    if not url_provided:
+      sentence = args
+    else:
+      url_gif = args
+
+  print("url_gif ", url_gif)
+
   # message must have attachment
-  if(len(message.attachments) <= 0):
+  if (not url_provided) and len(message.attachments) <= 0:
     error = await message.channel.send(
         embed=discord.Embed(
             color=ERROR_COLOR,
-            description="Pas d'image en pièce jointe",
+            description="Pas d'image en pièce jointe ou en URL",
         )
     )
     await asyncio.sleep(2)
@@ -138,7 +171,9 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
     return
 
   #define attachment url
-  attachment_url = message.attachments[0].url
+  attachment_url = url_gif if url_provided else message.attachments[0].url
+
+  print("url: ", attachment_url)
 
   #inside image
   try:
@@ -158,13 +193,6 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
     animated = inside.n_frames > 1
   except:
     animated = False
-
-  #determine attachment url
-  sentence = " "
-  if(isinstance(args, list)):
-    sentence = " ".join(args)
-  elif(isinstance(args, str)):
-    sentence = args
 
   # get rid of spaces
   sentence = sentence.strip()
