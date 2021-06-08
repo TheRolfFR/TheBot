@@ -267,7 +267,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
       d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
 
       # append to array
-      images.append(lastImage)
+      images.append(lastImage.quantize(dither=Image.NONE))
   else:
     duration = 0
     images = dest
