@@ -102,7 +102,7 @@ def _drawLine(img: Image.Image, d: ImageDraw, offsetX: int, offsetY: int, line: 
         emojiDict[element] = ori.resize(finalSize, Image.BICUBIC)
 
       # paste emoji
-      img.paste(emojiDict[element], (offsetX, offsetY), emojiDict[element])
+      img.paste(emojiDict[element], (int(offsetX), int(offsetY)), emojiDict[element])
       offsetX += emojiSize
     else:
       # it's text
