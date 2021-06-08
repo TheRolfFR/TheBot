@@ -269,6 +269,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
       # append to array
       images.append(lastImage)
   else:
+    duration = 0
     images = dest
   
   await message.delete()
