@@ -31,12 +31,18 @@ FONT_SIZE_MESSAGE = 22
 REACTION_EMOJI = '❌'
 REACTION_TIMEOUT = 30.0
 
-def _image_to_discord_file(img, file_name="image.png"):
+def _image_to_discord_file(img, file_name="image", duration=0):
   buffered = BytesIO()
-  img.save(buffered, format="PNG")
+
+  if isinstance(img, list):
+    img[0].save(buffered, format='GIF', save_all=True, append_images=img[1:], optimize=False, loop=0, duration=duration)
+  else:
+    img.save(buffered, format="PNG")
+  
   buffered.seek(0)
   
-  return discord.File(buffered, filename=file_name)
+  final_filename = file_name + (".gif" if isinstance(img, list) else ".png")
+  return discord.File(buffered, filename=final_filename)
 
 def _emoji_size(fontSize):
   return int(fontSize * 22 / 16)
@@ -148,6 +154,11 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
     await error.delete()
     return
 
+  try:
+    animated = inside.n_frames > 1
+  except:
+    animated = False
+
   #determine attachment url
   sentence = " "
   if(isinstance(args, list)):
@@ -177,12 +188,25 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
 
   width = max(inside_width, vrai_width, message_width)
 
+  if animated:
+    frames = []
+    for i in range(0, inside.n_frames):
+      inside.seek(i)
+
+      # appends a copy image
+      frames.append(inside.copy())
+  
   if(width == inside_width):
     inside_width = min(int(INSIDE_MAX_WIDTH * max(vrai_width, message_width)), inside_width)
     ratio = inside_width / width
     width = inside_width
     inside_height = int(inside_height * ratio)
-    inside = inside.resize((inside_width, inside_height))
+    if not animated:
+      inside = inside.resize((inside_width, inside_height))
+    else:
+      for i in range(0, len(frames)):
+        #resize frame
+        frames[i] = frames[i].resize((inside_width, inside_height))
   
   height = inside_height + vrai_height + message_height
 
@@ -197,15 +221,17 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
 
   (coordsY, emojiDictionary) = (IMAGE_MARGIN, {})
 
-  # paste image
-
-  dest.paste(inside, (int((width - inside_width)/2), IMAGE_MARGIN))
+  if not animated:
+    # paste image
+    dest.paste(inside, (int((width - inside_width)/2), IMAGE_MARGIN))
+  
   coordsY += inside_height + IMAGE_MARGIN/2
 
   d = ImageDraw.Draw(dest)
 
   # white outline
-  d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
+  if not animated:
+    d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
 
   # draw c'est vrai
   (coordsY, emojiDictionary) = _drawLine(dest, d, (width - vrai_width) / 2, coordsY, CEST_VRAI_MESSAGE, timesBold, FONT_SIZE_CESTVRAI, emojiDictionary)
@@ -220,8 +246,33 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
       (line_width, line_height) = _multiline_text_size(line, d, times, FONT_SIZE_MESSAGE)
       (coordsY, emojiDictionary) = _drawLine(dest, d, (width - line_width) / 2, coordsY, line, times, FONT_SIZE_MESSAGE, emojiDictionary)
 
+  if(animated):
+    duration = inside.info.get("duration", 0)
+    images = []
+
+    for i in range(0, len(frames)):
+      # create new image
+      lastImage = Image.new('RGB', (width, height))
+
+      #paste original image
+      lastImage.paste(dest)
+
+      # paste gif frame
+      lastImage.paste(frames[i], (int((width - inside_width)/2), IMAGE_MARGIN))
+      
+      # start drawing
+      d = ImageDraw.Draw(lastImage)
+
+      # reput outline
+      d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
+
+      # append to array
+      images.append(lastImage)
+  else:
+    images = dest
+  
   await message.delete()
-  result = await message.channel.send(f"{message.author.mention} dit:", file=_image_to_discord_file(dest, "cestvrai.png"))
+  result = await message.channel.send(f"{message.author.mention} dit:", file=_image_to_discord_file(images, "cestvrai", duration=duration))
   await result.add_reaction(REACTION_EMOJI)
   def check(reaction, user):
     return reaction.message == result and user == message.author and str(reaction.emoji) == REACTION_EMOJI
