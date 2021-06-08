@@ -199,13 +199,13 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
 
   # paste image
 
-  dest.paste(inside, (IMAGE_MARGIN, IMAGE_MARGIN))
+  dest.paste(inside, (int((width - inside_width)/2), IMAGE_MARGIN))
   coordsY += inside_height + IMAGE_MARGIN/2
 
   d = ImageDraw.Draw(dest)
 
   # white outline
-  d.rectangle([(IMAGE_MARGIN, IMAGE_MARGIN), (IMAGE_MARGIN + inside_width, IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
+  d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
 
   # draw c'est vrai
   (coordsY, emojiDictionary) = _drawLine(dest, d, (width - vrai_width) / 2, coordsY, CEST_VRAI_MESSAGE, timesBold, FONT_SIZE_CESTVRAI, emojiDictionary)
