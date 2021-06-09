@@ -24,7 +24,6 @@ OUTLINE_COLOR = COLOR_FONT # else (255, 255, 255, 255)
 OUTLINE_WIDTH = 1
 
 FONT_SIZE_CESTVRAI  = 36
-CEST_VRAI_MESSAGE = "C'EST VRAI"
 
 FONT_SIZE_MESSAGE = 22
 
@@ -130,13 +129,12 @@ regexp_url = re.compile(
   r'(?::\d+)?' # optional port
   r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: str, args):
-  """Commande meme c'est vrai: `{bot_prefix}cvrai <message d'explication (optionnel)>` + pièce jointe avec image: Affiche l'image dans un cadre avec le message d'explication"""
+async def cmd_gifmaker(bot: discord.Client, message: discord.Message, command: str, args, titre):
 
   url_provided = False
   url_gif = None
 
-  print(args)
+  # print(args)
 
   #determine attachment url
   sentence = " "
@@ -156,7 +154,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
     else:
       url_gif = args
 
-  print("url_gif ", url_gif)
+  # print("url_gif ", url_gif)
 
   # message must have attachment
   if (not url_provided) and len(message.attachments) <= 0:
@@ -173,7 +171,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
   #define attachment url
   attachment_url = url_gif if url_provided else message.attachments[0].url
 
-  print("url: ", attachment_url)
+  # print("url: ", attachment_url)
 
   #inside image
   try:
@@ -211,7 +209,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
 
   # drawings sizes
   (inside_width, inside_height) = inside.size
-  (vrai_width, vrai_height) = _multiline_text_size(CEST_VRAI_MESSAGE, d, timesBold, FONT_SIZE_CESTVRAI)
+  (vrai_width, vrai_height) = _multiline_text_size(titre, d, timesBold, FONT_SIZE_CESTVRAI)
   (message_width, message_height) = _multiline_text_size(sentence, d, times, FONT_SIZE_MESSAGE)
 
   width = max(inside_width, vrai_width, message_width)
@@ -262,7 +260,7 @@ async def cmd_cestvrai(bot: discord.Client, message: discord.Message, command: s
     d.rectangle([(int((width - inside_width)/2), IMAGE_MARGIN), (int((width + inside_width)/2), IMAGE_MARGIN + inside_height)], None, OUTLINE_COLOR, OUTLINE_WIDTH)
 
   # draw c'est vrai
-  (coordsY, emojiDictionary) = _drawLine(dest, d, (width - vrai_width) / 2, coordsY, CEST_VRAI_MESSAGE, timesBold, FONT_SIZE_CESTVRAI, emojiDictionary)
+  (coordsY, emojiDictionary) = _drawLine(dest, d, (width - vrai_width) / 2, coordsY, titre, timesBold, FONT_SIZE_CESTVRAI, emojiDictionary)
 
   # draw message if not empty
   if(sentence != ""):

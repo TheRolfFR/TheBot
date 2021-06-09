@@ -9,7 +9,8 @@ from .games import *
 from .mod import cmd_hardlog
 from .rename import cmd_rename
 from .larousse import cmd_larousse
-from .cestvrai import cmd_cestvrai
+from .gif.cvrai import cmd_cvrai
+from .gif.cfaux import cmd_cfaux
 
 laRadio = Radio()
 
@@ -17,7 +18,8 @@ BOT_COMMANDS = {
     "addrole": cmd_add_role,
     "addrank": cmd_add_rank,
     "clear": cmd_clear,
-    "cvrai": cmd_cestvrai,
+    "cfaux": cmd_cfaux,
+    "cvrai": cmd_cvrai,
     "delrank": cmd_del_rank,
     "hardlog": cmd_hardlog,
     "jump": cmd_jump,
