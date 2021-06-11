@@ -239,48 +239,28 @@ async def cmd_roles(bot, message, command, args):
 
 
 async def cmd_role_info(bot, message, command, args):
-    """
+  """
 	Usage : `{bot_prefix}roleinfo <nom du role>`
 	Donne les informations du role
 	"""
+  # role name is all the args
+  role_name = " ".join(args)
 
-    ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
+  # getting role from name
+  ds_role = discord.utils.get(message.guild.roles, name=role_name)
 
-    if ds_role not in message.author.roles:
-        await message.channel.send(
-            embed=discord.Embed(
-                title=f"Aide sur {command}",
-                description=f"Vous n'avez pas la permission pour faire cette commande",
-                color=ERROR_COLOR,
-            )
-        )
-        return
-
-    pattern = "^=roleinfo (.*)"
-    if not re.search(pattern, message.content):
-        await message.channel.send(embed=bot.doc_embed("roleinfo", ERROR_COLOR))
-        return
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    role_name = re.findall(pattern, message.content)[0]
-    ds_role = discord.utils.get(message.guild.roles, name=role_name)
-
-    if ds_role:
-        embed = discord.Embed(title=f"{role_name}", color=ds_role.colour)
-        embed.add_field(name="Nombre de personnes", value=len(ds_role.members))
-        embed.add_field(name="Date de création", value=ds_role.created_at)
-        await message.channel.send(embed=embed)
-    else:
-        await message.channel.send(
-            embed=discord.Embed(
-                description=f"Le role {role_name} n'existe pas", color=ERROR_COLOR
-            )
-        )
-
-    session.close()
-
+  if ds_role:
+      embed = discord.Embed(title=f"{role_name}", color=ds_role.colour)
+      embed.add_field(name="Nombre de personnes", value=len(ds_role.members), inline=False)
+      embed.add_field(name="Couleur", value=str(ds_role.colour).upper(), inline=False)
+      embed.add_field(name="Date de création", value=ds_role.created_at.strftime("%m/%d/%Y, %H:%M:%S"), inline=False)
+      await message.channel.send(embed=embed)
+  else:
+      await message.channel.send(
+          embed=discord.Embed(
+              description=f"Le role {role_name} n'existe pas", color=ERROR_COLOR
+          )
+      )
 
 async def cmd_add_role(bot, message, command, args):
     """
