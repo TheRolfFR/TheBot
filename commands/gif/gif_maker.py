@@ -27,7 +27,7 @@ FONT_SIZE_CESTVRAI  = 36
 
 FONT_SIZE_MESSAGE = 22
 
-REACTION_EMOJI = '❌'
+REACTION_EMOJI = '🗑'
 REACTION_TIMEOUT = 30.0
 
 def _image_to_discord_file(img, file_name="image", duration=0):

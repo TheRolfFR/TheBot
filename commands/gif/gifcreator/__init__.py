@@ -30,6 +30,7 @@ class GIFCreator:
   def image(self, index: int):
     if index < 0 or index >= self.nbFrames():
       raise ValueError("Incorrect index chosen")
+    return self.images[index]
 
   def seek(self, index: int):
     if index < 0 or index >= self.nbFrames():
@@ -42,7 +43,7 @@ class GIFCreator:
     if isinstance(other, GIFCreator):
       # easier because just copy frames
       for i in range(other.nbFrames()):
-        other_images_array.append(images.image(i).copy())
+        other_images_array.append(other.image(i).copy())
 
       # copy max duration
       self.duration = max(self.duration, other.duration)
