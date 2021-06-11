@@ -12,6 +12,8 @@ from .larousse import cmd_larousse
 from .gif.cvrai import cmd_cvrai
 from .gif.cfaux import cmd_cfaux
 
+from .gif.ghis import cmd_ghis
+
 laRadio = Radio()
 
 BOT_COMMANDS = {
@@ -21,6 +23,7 @@ BOT_COMMANDS = {
     "cfaux": cmd_cfaux,
     "cvrai": cmd_cvrai,
     "delrank": cmd_del_rank,
+    "ghis": cmd_ghis,
     "hardlog": cmd_hardlog,
     "jump": cmd_jump,
     "jumptop": cmd_jump_top,
