@@ -37,6 +37,6 @@ async def cmd_clear(bot, message, command, args):
             description=f":x: **``{number}`` messages supprimé(s)** :x:",
         )
     )
-    await asyncio.sleep(6)
+    await asyncio.sleep(2)
     await alert.delete()
 

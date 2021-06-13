@@ -9,6 +9,14 @@ from os.path import join, dirname
 
 RADIO_LIST_PATH = join(dirname(__file__), 'radiolist.py')
 
+regexp_url = re.compile(
+  r'^(?:http|ftp)s?://' # http:// or https://
+  r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+  r'localhost|' #localhost...
+  r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+  r'(?::\d+)?' # optional port
+  r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
 def get_radio_list():
     """Dynamically imports radio list"""
 
@@ -128,6 +136,8 @@ class Radio:
                 player.resume()
             elif action == 'stop':
                 await player.stop()
+            elif re.match(regexp_url, args[0]) is not None!
+                await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
             
             #exit da fuck outa here
             return
@@ -172,7 +182,7 @@ class Radio:
                 # play radio
                 await player.play(radio_desc)
 
-                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de ${player.radio.display_name} dans ${ player.channel_name() }...'))
+                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de {player.radio.display_name} dans { player.channel_name() }...'))
             elif args[0] == "volume":
                 # get player
                 player = self.get_player(message.guild)
