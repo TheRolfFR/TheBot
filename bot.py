@@ -13,6 +13,7 @@ from settings import *
 from commands import *
 from commands.mod import cmd_hardlog_update
 from commands.botupdate import *
+from commands.sudo import *
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -135,6 +136,8 @@ async def on_message(message):
 			await cmd_help(bot, message, command, args)
 		elif command == COMMAND_UPDATE_NAME:
 			await cmd_update_bot(bot, message, command, args)
+		elif command == COMMAND_SUDO_NAME:
+			await cmd_sudo(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)
 			
