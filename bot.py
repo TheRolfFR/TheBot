@@ -55,7 +55,7 @@ class UTBot (discord.Client):
 		elif command == "rageux":
 			text = cmd_rageux.__doc__
 		else:
-			text = BOT_COMMANDS[command].__doc__
+			text = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS}[command].__doc__
 		return discord.Embed(title=f"Aide sur {command}", description=text.format(bot_prefix=self.prefix), color=color)
 
 my_intents = discord.Intents.default()
@@ -102,7 +102,7 @@ async def cmd_help(bot, message, command, args):
 			await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
 		else:
 			await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, description=f"La commande {args[0]} est inconnue"))
-			await message.channel.send(embed=discord.Embed(color=ERROR_COLOR, title="Liste des commandes", description="\n".join(list(BOT_COMMANDS.keys()))))
+			await cmd_help(bot, message, command, [])
 
 
 @bot.event
