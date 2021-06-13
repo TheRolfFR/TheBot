@@ -6,6 +6,7 @@ from settings import *
 from .radiodescription import RadioDescription
 from .radioplayer import RadioPlayer
 from os.path import join, dirname
+import re
 
 RADIO_LIST_PATH = join(dirname(__file__), 'radiolist.py')
 
