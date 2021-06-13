@@ -92,6 +92,9 @@ class Radio:
             if action == 'list':
                 await self.cmd_radio(bot, message, command, [])
                 return
+            elif re.match(regexp_url, args[0]) is not None:
+                await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
+                return
 
             # get player
             player = self.get_player(message.guild)
@@ -137,8 +140,6 @@ class Radio:
                 player.resume()
             elif action == 'stop':
                 await player.stop()
-            elif re.match(regexp_url, args[0]) is not None:
-                await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
             
             #exit da fuck outa here
             return
