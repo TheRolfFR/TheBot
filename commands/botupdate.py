@@ -88,5 +88,4 @@ async def reboot_successful(bot: discord.Client):
 
     await msg.delete()
   except Exception as e:
-    print(e)
     pass
