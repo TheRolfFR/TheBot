@@ -9,10 +9,11 @@ from .games import *
 from .mod import cmd_hardlog
 from .rename import cmd_rename
 from .larousse import cmd_larousse
-from .gif.cvrai import cmd_cvrai
-from .gif.cfaux import cmd_cfaux
 
+from .gif.cfaux import cmd_cfaux
+from .gif.cvrai import cmd_cvrai
 from .gif.ghis import cmd_ghis
+from .rageux import cmd_rageux
 
 laRadio = Radio()
 
@@ -20,10 +21,7 @@ BOT_COMMANDS = {
     "addrole": cmd_add_role,
     "addrank": cmd_add_rank,
     "clear": cmd_clear,
-    "cfaux": cmd_cfaux,
-    "cvrai": cmd_cvrai,
     "delrank": cmd_del_rank,
-    "ghis": cmd_ghis,
     "hardlog": cmd_hardlog,
     "jump": cmd_jump,
     "jumptop": cmd_jump_top,
@@ -39,4 +37,11 @@ BOT_COMMANDS = {
     "stats" : cmd_stats,
     "trad": cmd_trad,
     "uptime": cmd_uptime
+}
+
+BOT_SPECIAL_COMMANDS = {
+    "cfaux": cmd_cfaux,
+    "cvrai": cmd_cvrai,
+    "ghis": cmd_ghis,
+    "rageux": cmd_rageux
 }

@@ -10,9 +10,8 @@ import googletrans
 import keep_alive
 
 from settings import *
-from commands import BOT_COMMANDS, laRadio
+from commands import *
 from commands.mod import cmd_hardlog_update
-from commands.rageux import cmd_rageux
 from commands.botupdate import *
 
 class UTBot (discord.Client):
@@ -88,19 +87,16 @@ async def cmd_help(bot, message, command, args):
 	Usage : `{bot_prefix}help <commande>`
 	Donne de l’aide sur une commande
 	"""
+	command_map = (BOT_COMMANDS | BOT_SPECIAL_COMMANDS) if SPECIAL_SERVERS.index(message.guild.id) != -1 else BOT_COMMANDS
+
 	if len(args) == 0:
-		commandlist = list(BOT_COMMANDS.keys())
-		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
-			commandlist.append("rageux")
-			commandlist.sort()
+		commandlist = list(command_map.keys())
+		commandlist.sort()
 		await message.channel.send(embed=discord.Embed(color=HELP_COLOR, title="Liste des commandes", description="\n".join(list(commandlist)) + f"\n\nUtilisez `{bot.prefix}help <commande>` pour plus d’informations sur une commande"))
 	elif len(args) > 1:
 		await message.channel.send(embed=bot.doc_embed("help", ERROR_COLOR))
 	else:
-		commandlist = list(BOT_COMMANDS.keys())
-		if message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602:
-			commandlist.append("rageux")
-			commandlist.sort()
+		commandlist = list(command_map.keys())
 		
 		if args[0] in commandlist or args[0] == "help":
 			await message.channel.send(embed=bot.doc_embed(args[0], HELP_COLOR))
@@ -119,18 +115,9 @@ async def on_message(message):
 		command = commandtokens[0]
 		args = commandtokens[1:]
 
-		if command == "help":
-			await cmd_help(bot, message, command, args)
+		command_map = (BOT_COMMANDS | BOT_SPECIAL_COMMANDS) if SPECIAL_SERVERS.index(message.guild.id) != -1 else BOT_COMMANDS
 
-		if (message.guild.id == 574947319125114900 or message.guild.id == 715650034598674602) and command == "rageux":
-			await cmd_rageux(bot, message, command, args)
-		elif command in BOT_COMMANDS.keys():
-			await BOT_COMMANDS[command](bot, message, command, args)
-		elif "\n" in command:
-			# try \n bug fix
-
-			print(commandtokens)
-
+		if "\n" in command:
 			firstindex = command.find("\n")
 
 			#rebuild commands
@@ -144,11 +131,12 @@ async def on_message(message):
 			# replace new command
 			command = cmd
 
-			print(command, args)
-			if command in BOT_COMMANDS.keys():
-				await BOT_COMMANDS[command](bot, message, command, args)
+		if command == "help":
+			await cmd_help(bot, message, command, args)
 		elif command == COMMAND_UPDATE_NAME:
 			await cmd_update_bot(bot, message, command, args)
+		elif command in BOT_COMMANDS.keys():
+			await BOT_COMMANDS[command](bot, message, command, args)
 			
 @bot.event
 async def on_message_edit(before, after):
