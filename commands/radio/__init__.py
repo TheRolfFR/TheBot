@@ -150,7 +150,7 @@ class Radio:
                 alias = str(args[1])
 
                 if re.match(regexp_url, alias) is not None:
-                 await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
+                    await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
                     return
 
                 # search for radio
