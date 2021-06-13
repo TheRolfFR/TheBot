@@ -13,6 +13,7 @@ from settings import *
 from commands import BOT_COMMANDS, laRadio
 from commands.mod import cmd_hardlog_update
 from commands.rageux import cmd_rageux
+from commands.botupdate import *
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -74,9 +75,11 @@ async def on_ready():
 	print(f"ID: {bot.user.id}")
 	print(f"Serving: {len(bot.guilds)} guilds.")
 	print("-----------------------------")
-	await asyncio.sleep(4)
-	bot.launchtime = time.time()
+
 	await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=f'{ bot.prefix }help'))
+	
+	# reboot successful message end
+	await reboot_successful(bot)
 	
 
 
@@ -115,7 +118,7 @@ async def on_message(message):
 		commandtokens = message.content[len(bot.prefix):].split(" ")
 		command = commandtokens[0]
 		args = commandtokens[1:]
-		
+
 		if command == "help":
 			await cmd_help(bot, message, command, args)
 
@@ -144,9 +147,9 @@ async def on_message(message):
 			print(command, args)
 			if command in BOT_COMMANDS.keys():
 				await BOT_COMMANDS[command](bot, message, command, args)
+		elif command == COMMAND_UPDATE_NAME:
+			await cmd_update_bot(bot, message, command, args)
 			
-			
-
 @bot.event
 async def on_message_edit(before, after):
 	await on_message(after)
