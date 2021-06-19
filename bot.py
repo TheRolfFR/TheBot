@@ -76,6 +76,8 @@ async def on_ready():
 	print(f"Serving: {len(bot.guilds)} guilds.")
 	print("-----------------------------")
 
+	[await vc.disconnect(force=True) for vc in bot.voice_clients if not vc.is_playing()]
+
 	await bot.change_presence(status=discord.Status.online, activity=discord.Game(name=f'{ bot.prefix }help'))
 	
 	# reboot successful message end
@@ -137,6 +139,7 @@ async def on_message(message):
 		elif command == COMMAND_UPDATE_NAME:
 			await cmd_update_bot(bot, message, command, args)
 		elif command == COMMAND_SUDO_NAME:
+			args.append(laRadio)
 			await cmd_sudo(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)

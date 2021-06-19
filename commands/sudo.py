@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import os
 
 from settings import *
 
@@ -33,7 +34,9 @@ async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, 
   )
   result = await message.channel.send(embed=emb)
   
-  if(args[0]) == "delete" and len(args) == 2:
+  subcommand = args[0]
+
+  if(subcommand == "delete" and len(args) >= 2):
     # second thing is the url
     url_split = args[1].split('/')[::-1][:3][::-1]
 
@@ -47,10 +50,21 @@ async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, 
 
       emb.add_field(name="Action", value="Deleting message...", inline=False)
       await result.edit(embed=emb)
-
+      await asyncio.sleep(2)
       await msg.delete()
     except Exception as e:
       pass
-  
+
+  if(subcommand == "nggyu" and len(args) >= 2):
+    laRadio = args[len(args) - 1]
+
+    user_targeted = message.mentions[0] if len(message.mentions) > 0 else message.author
+
+    laRadio.cmd_radio(bot, message, ['play', 'nggyu'], user_targeted)
+
+    emb.add_field(name="Action", value="Lancement du troll...", inline=False)
+    await result.edit(embed=emb)
+    await asyncio.sleep(2)
+
   await message.delete()
   await result.delete()
