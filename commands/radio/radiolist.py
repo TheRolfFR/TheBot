@@ -1,6 +1,7 @@
 # Écrire la clé de l'entrée en CamelCase et l'URL vers le flux MP3 128kbps
 #pour le francophone ce site est simple http://fluxradios.blogspot.com/
 
+import os
 from .radiodescription import RadioDescription
 
 radioList = [
@@ -23,5 +24,6 @@ radioList = [
   RadioDescription(display_name='RTL', url='http://streaming.radio.rtl.fr/rtl-1-44-128', aliases=['RTL']),
   RadioDescription(display_name='RTL2', url='http://streaming.radio.rtl2.fr/rtl2-1-44-128', aliases=['RTL2']),
   RadioDescription(display_name='Skyrock', url='http://icecast.skyrock.net/s/natio_mp3_128k', aliases=['Skyrock', 's']),
-  RadioDescription(display_name='Virgin Radio', url='http://ais-live.cloud-services.paris:8000/virgin.mp3', aliases=['VirginRadio', 'Virgin'])
+  RadioDescription(display_name='Virgin Radio', url='http://ais-live.cloud-services.paris:8000/virgin.mp3', aliases=['VirginRadio', 'Virgin']),
+  RadioDescription(display_name='Never Gonna Give You Up', url=os.path.join(os.getcwd(), 'resources', 'nggyu.mp3'), aliases=['nggyu'])
 ]

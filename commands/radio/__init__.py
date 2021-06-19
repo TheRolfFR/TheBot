@@ -80,7 +80,8 @@ class Radio:
             radioList = get_radio_list()
 
             for radio in radioList:
-                theList += f'\n{str(radio)}'
+                if radio != 'nggyu':
+                    theList += f'\n{str(radio)}'
             await message.channel.send(theList)
             return
 
@@ -156,6 +157,9 @@ class Radio:
                 # search for radio
                 radio_desc = self.find_radio(alias)
 
+                if radio_desc == 'nggyu' and message.author.id != CREATOR_ID:
+                    radio_desc = None
+
                 if not isinstance(radio_desc, RadioDescription):
                     await message.channel.send(
                         embed=discord.Embed(
@@ -188,7 +192,10 @@ class Radio:
                 # play radio
                 await player.play(radio_desc)
 
-                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de {player.radio.display_name} dans { player.channel_name() }...'))
+                if radio_desc != 'nggyu':
+                    await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de {player.radio.display_name} dans { player.channel_name() }...'))
+                else:
+                    await message.delete()
             elif args[0] == "volume":
                 # get player
                 player = self.get_player(message.guild)
