@@ -90,7 +90,7 @@ async def cmd_help(bot, message, command, args):
 	Usage : `{bot_prefix}help <commande>`
 	Donne de l’aide sur une commande
 	"""
-	command_map = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS} if SPECIAL_SERVERS.index(message.guild.id) != -1 else BOT_COMMANDS
+	command_map = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS} if message.guild.id in SPECIAL_SERVERS else BOT_COMMANDS
 
 	if len(args) == 0:
 		commandlist = list(command_map.keys())
@@ -118,7 +118,7 @@ async def on_message(message):
 		command = commandtokens[0]
 		args = commandtokens[1:]
 
-		command_map = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS} if SPECIAL_SERVERS.index(message.guild.id) != -1 else BOT_COMMANDS
+		command_map = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS} if message.guild.id in SPECIAL_SERVERS else BOT_COMMANDS
 
 		if "\n" in command:
 			firstindex = command.find("\n")
