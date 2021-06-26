@@ -143,7 +143,7 @@ async def on_message(message):
 			await cmd_sudo(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
 			await BOT_COMMANDS[command](bot, message, command, args)
-    elif message.channel.guild.id in SPECIAL_SERVERS and command in BOT_SPECIAL_COMMANDS.keys():
+		elif message.channel.guild.id in SPECIAL_SERVERS and command in BOT_SPECIAL_COMMANDS.keys():
 			await BOT_SPECIAL_COMMANDS[command](bot, message, command, args)
 			
 @bot.event
