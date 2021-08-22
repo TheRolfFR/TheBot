@@ -13,3 +13,4 @@ idna==2.10
 soupsieve==2.0.1
 urllib3==1.25.9
 GitPython
+python-dotenv

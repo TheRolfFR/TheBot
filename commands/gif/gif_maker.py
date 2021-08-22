@@ -134,7 +134,7 @@ async def cmd_gifmaker(bot: discord.Client, message: discord.Message, command: s
   url_provided = False
   url_gif = None
 
-  # print(args)
+  print(args)
 
   #determine attachment url
   sentence = " "

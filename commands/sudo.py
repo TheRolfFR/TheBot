@@ -2,11 +2,13 @@ import discord
 import asyncio
 import os
 
+from commands.player.radio import cmd_radio
+
 from settings import *
 
 COMMAND_SUDO_NAME = "sudo"
 
-async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, args):
+async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, args, voicePlayers):
   """
   Command to restart bot
   """
@@ -56,11 +58,9 @@ async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, 
       pass
 
   if(subcommand == "nggyu" and len(args) >= 2):
-    laRadio = args[len(args) - 1]
-
     user_targeted = message.mentions[0] if len(message.mentions) > 0 else message.author
 
-    laRadio.cmd_radio(bot, message, ['play', 'nggyu'], user_targeted)
+    cmd_radio(bot, message, ['play', 'nggyu'], user_targeted, voicePlayers)
 
     emb.add_field(name="Action", value="Lancement du troll...", inline=False)
     await result.edit(embed=emb)
