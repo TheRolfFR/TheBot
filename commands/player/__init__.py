@@ -89,7 +89,8 @@ class Player:
 
       # replay
       self.vc.play(source.source())
-      self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
+      if not self.vc.source.is_opus:
+        self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
     return
 
   def setVolume(self, volume):
