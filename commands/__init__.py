@@ -10,6 +10,7 @@ from .games import *
 from .mod import cmd_hardlog
 from .rename import cmd_rename
 from .larousse import cmd_larousse
+from .player.youtube import cmd_youtube
 
 from .gif.cfaux import cmd_cfaux
 from .gif.cvrai import cmd_cvrai
@@ -35,7 +36,8 @@ BOT_COMMANDS = {
     "roleinfo": cmd_role_info,
     "stats" : cmd_stats,
     "trad": cmd_trad,
-    "uptime": cmd_uptime
+    "uptime": cmd_uptime,
+    "youtube": cmd_youtube
 }
 
 BOT_SPECIAL_COMMANDS = {
