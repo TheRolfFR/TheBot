@@ -2,6 +2,9 @@ import time
 import asyncio
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import discord
 import asyncio
 
@@ -14,6 +17,9 @@ from commands import *
 from commands.mod import cmd_hardlog_update
 from commands.botupdate import *
 from commands.sudo import *
+
+global voicePlayers
+voicePlayers = PlayerList()
 
 class UTBot (discord.Client):
 	def __init__(self, prefix, *args, **kwargs):
@@ -31,11 +37,12 @@ class UTBot (discord.Client):
 		# when stoppped
 
 		# stop radio
-		for player in laRadio.players:
+		for player in voicePlayers.players:
 			asyncio.run(player.stop())
 
 		# stop keep alive
-		keep_alive.stop()
+		if not os.getenv('DEV', False):
+			keep_alive.stop()
 	
 	def read_token(self):
 		token = os.environ.get("DISCORD_TOKEN", "")
@@ -139,10 +146,13 @@ async def on_message(message):
 		elif command == COMMAND_UPDATE_NAME:
 			await cmd_update_bot(bot, message, command, args)
 		elif command == COMMAND_SUDO_NAME:
-			args.append(laRadio)
+			args.append(voicePlayers)
 			await cmd_sudo(bot, message, command, args)
 		elif command in BOT_COMMANDS.keys():
-			await BOT_COMMANDS[command](bot, message, command, args)
+			if command == "radio":
+				await BOT_COMMANDS[command](bot, message, command, args, voicePlayers)
+			else:
+				await BOT_COMMANDS[command](bot, message, command, args)
 			
 @bot.event
 async def on_message_edit(before, after):
@@ -157,7 +167,7 @@ async def on_message_edit(before, after):
 
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
-	await laRadio.update(member, before, after)
+	await voicePlayers.update(member, before, after)
 
 @bot.event
 async def on_message_delete(message: discord.Message):
@@ -170,7 +180,8 @@ async def on_message_delete(message: discord.Message):
 	)
 
 # start the server to stay alive
-keep_alive.start()
+if not os.getenv('DEV', False):
+	keep_alive.start()
 
 bot.run()
 
