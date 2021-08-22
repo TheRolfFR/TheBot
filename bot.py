@@ -141,8 +141,8 @@ async def on_message(message):
 		elif command == COMMAND_SUDO_NAME:
 			args.append(laRadio)
 			await cmd_sudo(bot, message, command, args)
-		elif command in BOT_COMMANDS.keys():
-			await BOT_COMMANDS[command](bot, message, command, args)
+		elif command in command_map.keys():
+			await command_map[command](bot, message, command, args)
 			
 @bot.event
 async def on_message_edit(before, after):
