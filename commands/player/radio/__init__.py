@@ -72,7 +72,7 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
 
         # what you can do before all of this is display the list
         if action == 'list':
-            await cmd_radio(bot, message, command, [])
+            await cmd_radio(bot, message, command, [], voicePlayers)
             return
         elif re.match(regexp_url, args[0]) is not None:
             await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
@@ -149,7 +149,7 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
                         description= f"{ message.author.mention }, impossible de trouver la radio {alias}"
                     )
                 )
-                await cmd_radio(bot, message, command, [])
+                await cmd_radio(bot, message, command, [], voicePlayers)
                 return
 
             # exit if user not in voice channel

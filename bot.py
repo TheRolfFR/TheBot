@@ -147,7 +147,7 @@ async def on_message(message):
 			await cmd_update_bot(bot, message, command, args)
 		elif command == COMMAND_SUDO_NAME:
 			args.append(voicePlayers)
-			await cmd_sudo(bot, message, command, args)
+			await cmd_sudo(bot, message, command, args, voicePlayers)
 		elif command in BOT_COMMANDS.keys():
 			if command == "radio":
 				await BOT_COMMANDS[command](bot, message, command, args, voicePlayers)
