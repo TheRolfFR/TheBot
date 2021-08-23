@@ -61,7 +61,7 @@ class YouTubeSource(PlayerSource):
   async def from_url(cls, url):
     info = ydl.extract_info(url, download=False)
 
-    return (info['formats'][0]['url'], info['duration'], f"{info['title']} ({ '{:d}:{:02d}:{:02d}'.format(info['duration']//3600, info['duration']//60, info['duration']%60) if info['duration'] > 3600 else '{:d}:{:02d}'.format(info['duration']//60, info['duration']%60) })")
+    return (info['formats'][0]['url'], info['duration'], f"{info['title']} ({convert_dhms_string(info['duration'])})")
   
   def source(self):
     self._timestamp = time.time()
@@ -126,6 +126,7 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
     Joue une vidéo YouTube dans le channel audio
     `{bot_prefix}youtube play <url>` : Joue une vidéo
     `{bot_prefix}youtube playing` : Indique quelle vidéo est jouée
+    `{bot_prefix}youtube playing` : Indique quelles vidéos sont en attente
     `{bot_prefix}youtube pause`: Met en pause la vidéo
     `{bot_prefix}youtube resume` : Rejoue la vidéo
     `{bot_prefix}youtube stop` : Stoppe la vidéo
@@ -199,6 +200,32 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
               mention_author=False
             )
             return
+
+        elif action == 'queue':
+          if isinstance(player.source, YouTubeSource):
+            queue_length = len(player.source._queue)
+
+            desc_list = []
+            for url in player.source._queue:
+              infos = await YouTubeSource.from_url(url)
+              desc_list.append(f"**[{infos[2]}]({url})**")
+
+            desc = f"{queue_length} vidéo{'s' if queue_length > 1 else ''} en attente"
+
+            if queue_length > 0:
+              desc += ":\n"
+              desc += "\n".join(desc_list)
+            
+            await message.channel.send(
+              embed=discord.Embed(
+                title="Youtube: queue",
+                color=CONFIRM_COLOR,
+                description=desc[:2048]
+              ),
+              reference=message,
+              mention_author=False
+            )
+          return
 
         # stop if not in channel with bot
 
