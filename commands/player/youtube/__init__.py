@@ -126,7 +126,7 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
     Joue une vidéo YouTube dans le channel audio
     `{bot_prefix}youtube play <url>` : Joue une vidéo
     `{bot_prefix}youtube playing` : Indique quelle vidéo est jouée
-    `{bot_prefix}youtube playing` : Indique quelles vidéos sont en attente
+    `{bot_prefix}youtube queue` : Indique quelles vidéos sont en attente
     `{bot_prefix}youtube pause`: Met en pause la vidéo
     `{bot_prefix}youtube resume` : Rejoue la vidéo
     `{bot_prefix}youtube stop` : Stoppe la vidéo
