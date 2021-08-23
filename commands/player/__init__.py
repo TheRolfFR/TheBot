@@ -114,11 +114,15 @@ class Player:
     """Pause play of radio"""
     if self.vc is not None and not self.vc.is_paused():
       self.vc.pause()
+      if self.source is not None:
+        self.source.on_pause()
   
   def resume(self):
     """Resume play of radio"""
     if self.vc is not None and self.vc.is_paused():
       self.vc.resume()
+      if self.source is not None:
+        self.source.on_resume()
 
   async def stop(self):
     """Stop radio playback and disconnect"""

@@ -10,6 +10,9 @@ import os
 from commands.player import PlayerList, PlayerSource, Player
 import re
 
+import time
+from utility import convert_dhms_string
+
 regexp_youtube_url = re.compile(r"""^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$""", re.IGNORECASE)
 
 ytdl_format_options = {
@@ -28,8 +31,13 @@ class YouTubeSource(PlayerSource):
   _queue: list
   _player: Player
   _loop: asyncio.AbstractEventLoop
+  _duration: float
+  _timestamp: float
+  _diff: float
   def __init__(self, display_name: str, urls, loop: asyncio.AbstractEventLoop):
     self._loop = loop
+    self._diff = 0
+    self._timestamp = 0
     url = ""
     queue = []
 
@@ -44,24 +52,45 @@ class YouTubeSource(PlayerSource):
     self._queue = queue
 
   async def load(self):
-    (url2, name) = await YouTubeSource.from_url(self.path)
+    (url2, duration, name) = await YouTubeSource.from_url(self.path)
     self._source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
+    self._duration = duration
     self.display_name = name # update name too
 
   @classmethod
   async def from_url(cls, url):
     info = ydl.extract_info(url, download=False)
 
-    return (info['formats'][0]['url'], f"{info['title']} ({ '{:d}:{:02d}:{:02d}'.format(info['duration']//3600, info['duration']//60, info['duration']%60) if info['duration'] > 3600 else '{:d}:{:02d}'.format(info['duration']//60, info['duration']%60) })")
+    return (info['formats'][0]['url'], info['duration'], f"{info['title']} ({ '{:d}:{:02d}:{:02d}'.format(info['duration']//3600, info['duration']//60, info['duration']%60) if info['duration'] > 3600 else '{:d}:{:02d}'.format(info['duration']//60, info['duration']%60) })")
   
   def source(self):
+    self._timestamp = time.time()
+    self._diff = 0
     return self._source
 
   def after(self, player: Player):
+    self._diff += (time.time() - self._timestamp)
+    self._timestamp = -1
     if self._player is None:
       self._player = player
     
     return self.nextsong
+
+  def duration(self):
+    return self._duration
+
+  def progress(self):
+    return round(self._diff, 0) if self._timestamp == -1 else round(self._diff + time.time() - self._timestamp, 0)
+
+  def on_pause(self):
+    now = time.time()
+    super().on_pause()
+    self._diff += (now - self._timestamp)
+    self._timestamp = -1
+
+  def on_resume(self):
+    self._timestamp = time.time()
+    super().on_resume()
 
   def nextsong(self, error):
     if error is not None or len(self._queue) == 0:
@@ -124,21 +153,48 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
         # do action
         if action == 'playing':
             msg = "Rien n'est joué actuellement"
-
-            radio_name = player.name()
-            channel_name = player.channel_name()
-            if radio_name:
-                if player.is_paused():
-                    msg = f'``{ radio_name }`` pausée dans ``{ channel_name }``'
-                else:
-                    msg = f'``{ radio_name }`` jouée dans ``{ channel_name }``'
             
+            emb = discord.Embed(
+              title="YouTube",
+              color=CONFIRM_COLOR,
+              description=msg,
+            )
+
+            if player.is_playing() or player.is_paused():
+              name = player.name()
+              channel_name = player.channel_name()
+              if name:
+                if player.is_paused():
+                  msg = f'``{ name }`` pausée dans ``{ channel_name }``'
+                else:
+                  msg = f'``{ name }`` jouée dans ``{ channel_name }``'
+                emb.description = msg
+
+              if isinstance(player.source, YouTubeSource):
+                progress = player.source.progress()
+                duration = player.source.duration()
+
+                if(progress > duration):
+                  progress = duration
+
+                emb.add_field(
+                  name='Time',
+                  value=f'[{convert_dhms_string(progress)} / {convert_dhms_string(duration)}]'
+                )
+
+                percent = (progress / duration) * 100 // 1
+                index = min(percent // 10, 9)
+                value = ''
+                for i in range(0, 10):
+                  value += '―' if i != index else '▬'
+                value += f' **{percent}**%'
+                emb.add_field(
+                  name='Progress',
+                  value=value
+                )
+
             await message.channel.send(
-              embed=discord.Embed(
-                title="YouTube",
-                color=CONFIRM_COLOR,
-                description=msg,
-              ),
+              embed=emb,
               reference=message,
               mention_author=False
             )

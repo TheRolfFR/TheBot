@@ -23,6 +23,24 @@ class PlayerSource:
   def source(self):
     return None
 
+  def duration(self):
+    """
+      Returns duration in seconds
+    """
+    return -1
+
+  def progress(self):
+    """
+      Returns current playing progress in seconds
+    """
+    return -1
+
+  def on_pause(self):
+    return
+
+  def on_resume(self):
+    return
+
   def __ne__(self, o):
     """!= oeprator overload"""
     return not self.__eq__(o)
