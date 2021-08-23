@@ -7,7 +7,7 @@ import json
 import youtube_dl
 
 import os
-from commands.player import PlayerList, PlayerSource
+from commands.player import PlayerList, PlayerSource, Player
 import re
 
 regexp_youtube_url = re.compile(r"""^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$""", re.IGNORECASE)
@@ -25,10 +25,25 @@ ydl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 class YouTubeSource(PlayerSource):
   _source: discord.AudioSource
-  def __init__(self, display_name, url):
-    super().__init__(display_name, url)
+  _queue: list
+  _player: Player
+  _loop: asyncio.AbstractEventLoop
+  def __init__(self, display_name: str, urls, loop: asyncio.AbstractEventLoop):
+    self._loop = loop
+    url = ""
+    queue = []
 
-  async def load(self, loop):
+    if isinstance(urls, str):
+      url = urls
+    elif isinstance(urls, list):
+      url = urls[0]
+      queue = urls[1:]
+    
+    super().__init__(display_name, url)
+    self._player = None
+    self._queue = queue
+
+  async def load(self):
     (url2, name) = await YouTubeSource.from_url(self.path)
     self._source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
     self.display_name = name # update name too
@@ -36,14 +51,44 @@ class YouTubeSource(PlayerSource):
   @classmethod
   async def from_url(cls, url):
     info = ydl.extract_info(url, download=False)
-    json_str = json.dumps(info, indent=4) + '\n'
-    with open("result.json", 'w') as fout:
-      print(json_str, file=fout)
 
     return (info['formats'][0]['url'], f"{info['title']} ({ '{:d}:{:02d}:{:02d}'.format(info['duration']//3600, info['duration']//60, info['duration']%60) if info['duration'] > 3600 else '{:d}:{:02d}'.format(info['duration']//60, info['duration']%60) })")
   
   def source(self):
     return self._source
+
+  def after(self, player: Player):
+    if self._player is None:
+      self._player = player
+    
+    return self.nextsong
+
+  def nextsong(self, error):
+    if error is not None or len(self._queue) == 0:
+      return
+    
+    next = self._queue.pop(0)
+
+    self.path = next
+    fut = asyncio.run_coroutine_threadsafe(self.load(), self._loop)
+    try:
+      fut.result()
+      coro = self._player.play(self)
+      fut = asyncio.run_coroutine_threadsafe(coro, self._loop)
+      fut.result()
+    except:
+        # an error happened
+        pass
+
+  def enqueue(self, url):
+    if isinstance(url, str):
+      self._queue.append(url)
+    elif isinstance(url, list):
+      self._queue += url
+
+  def clear(self):
+    self._queue.clear()
+
 
 CMD_YOUTUBE_NAME = "youtube"
 
@@ -126,23 +171,17 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
         #exit da fuck outa here
         return
 
-    if isinstance(args, list) and len(args) == 2:
+    if isinstance(args, list) and (args[0] == 'play' or len(args) == 2):
         if args[0] == 'play': # play a radio
           # get url word
-          url = str(args[1])
+          supposed_urls = args[1:]
 
-          res = re.match(regexp_youtube_url, url)
-          if res is None:
-            await message.channel.send(
-              embed=discord.Embed(
-                title="Errur d'arguments",
-                  color=ERROR_COLOR,
-                  description="La commande ne prend que des liens YouTube",
-              ),
-              reference=message,
-              mention_author=False
-            )
-            return
+          urls = []
+
+          for url in supposed_urls:
+            res = re.match(regexp_youtube_url, url)
+            if res is not None:
+              urls.append(url)
 
           # exit if user not in voice channel
           if not message.author.voice:
@@ -158,14 +197,19 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
               return
 
           await message.add_reaction('⏳')
-          youtube_source = YouTubeSource("YouTube", url)
-
-          await youtube_source.load(bot.loop)
 
           # go to voice channel
           await player.go_to(message.author.voice.channel)
 
-          await player.play(youtube_source)
+          read = True
+
+          if player.is_playing() and player.source is not None and isinstance(player.source, YouTubeSource):
+            read = False
+            player.source.enqueue(urls)
+          else:
+            youtube_source = YouTubeSource("YouTube", urls, bot.loop)
+            await youtube_source.load()
+            await player.play(youtube_source)
 
           await message.remove_reaction('⏳', bot.user)
 
@@ -173,7 +217,7 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
             embed=discord.Embed(
               title="YouTube",
               color=CONFIRM_COLOR,
-              description=f'Démarrage de ``{player.source.display_name}`` dans ``{ player.channel_name() }``...'
+              description=f'{len(urls)} titre{"s" if len(urls) > 1 else "" } dans ``{ player.channel_name() }``\n Démarrage de ``{player.name()}``...' if read else f"Ajout de {len(urls)} titre{'s' if len(urls) > 1 else '' } à la queue"
             ),
             reference=message,
             mention_author=False

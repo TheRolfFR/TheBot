@@ -17,6 +17,9 @@ class PlayerSource:
     # compare strictly all the fields
     return self.path == o.path and self.display_name == o.display_name
 
+  def after(self, player):
+    return lambda *args, **kwargs: None
+
   def source(self):
     return None
 

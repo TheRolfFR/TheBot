@@ -80,17 +80,19 @@ class Player:
     if self.source is None or self.source != source:
       self.source = source
       
-      if self.vc is None:
-        raise AttributeError("Player must have a voice client, please use go_to function")
+    if self.vc is None:
+      print("Player must have a voice client, please use go_to function")
+      return
 
-      # stop if playing
-      if self.vc.is_playing():
-        self.vc.stop()
+    # stop if playing
+    if self.vc.is_playing():
+      self.vc.stop()
 
-      # replay
-      self.vc.play(source.source())
-      if not self.vc.source.is_opus:
-        self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
+    # replay
+    after_callable = source.after(self)
+    self.vc.play(source.source(), after= after_callable)
+    if not self.vc.source.is_opus:
+      self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
     return
 
   def setVolume(self, volume):
