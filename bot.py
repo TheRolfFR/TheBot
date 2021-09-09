@@ -150,9 +150,9 @@ async def on_message(message):
 			await cmd_sudo(bot, message, command, args, voicePlayers)
 		elif command in command_map.keys():
 			if command in ["radio", "youtube"]:
-				await BOT_COMMANDS[command](bot, message, command, args, voicePlayers)
+				await command_map[command](bot, message, command, args, voicePlayers)
 			else:
-				await BOT_COMMANDS[command](bot, message, command, args)
+				await command_map[command](bot, message, command, args)
 			
 @bot.event
 async def on_message_edit(before, after):
