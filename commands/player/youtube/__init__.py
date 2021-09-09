@@ -98,9 +98,12 @@ class YouTubeSource(PlayerSource):
     
     next = self._queue.pop(0)
 
-    self.path = next
-    fut = asyncio.run_coroutine_threadsafe(self.load(), self._loop)
+    fut = asyncio.run_coroutine_threadsafe(self._player.stop(disconnect=False), self._loop)
+    
     try:
+      fut.result()
+      self.path = next
+      fut = asyncio.run_coroutine_threadsafe(self.load(), self._loop)
       fut.result()
       coro = self._player.play(self)
       fut = asyncio.run_coroutine_threadsafe(coro, self._loop)
@@ -125,6 +128,8 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
     """
     Joue une vidéo YouTube dans le channel audio
     `{bot_prefix}youtube play <url>` : Joue une vidéo
+    `{bot_prefix}youtube skip` : Joue une vidéo
+    `{bot_prefix}youtube clear` : Joue une vidéo
     `{bot_prefix}youtube playing` : Indique quelle vidéo est jouée
     `{bot_prefix}youtube queue` : Indique quelles vidéos sont en attente
     `{bot_prefix}youtube pause`: Met en pause la vidéo
@@ -227,6 +232,20 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
             )
           return
 
+        elif action == "clear":
+          if isinstance(player.source, YouTubeSource):
+            player.source.clear()
+            await message.channel.send(
+              embed=discord.Embed(
+                title="YouTube",
+                color=CONFIRM_COLOR,
+                description="Queue cleared"
+              ),
+              reference=message,
+              mention_author=False
+            )
+          return
+
         # stop if not in channel with bot
 
         # if user not in voice channel
@@ -250,6 +269,11 @@ async def cmd_youtube(bot: discord.Client, message: discord.Message, command: st
         elif action == 'stop':
             await player.stop()
             await message.add_reaction('⏹️')
+        elif action == "skip":
+          if isinstance(player.source, YouTubeSource):
+            player.source.nextsong(None)
+            await message.add_reaction('⏭️')
+          return
         
         #exit da fuck outa here
         return

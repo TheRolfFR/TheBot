@@ -124,16 +124,20 @@ class Player:
       if self.source is not None:
         self.source.on_resume()
 
-  async def stop(self):
+  async def stop(self, disconnect=True):
     """Stop radio playback and disconnect"""
     if self.vc is not None:
       if self.vc.is_playing():
         self.vc.stop()
 
+      if disconnect:
+        await self.vc.disconnect()
+
+  async def disconnect(self):
+    if self.vc is not None:
       await self.vc.disconnect()
 
-      self.vc = None
-      self.source = None
+    self.vc = None
 
   def is_playing(self):
     """Tells if radio playing or not"""
