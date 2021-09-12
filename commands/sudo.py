@@ -27,6 +27,11 @@ async def cmd_sudo(bot: discord.Client, message: discord.Message, command: str, 
   if len(args) == 0:
     return
 
+  if args[0] == "say":
+    await message.delete()
+    await message.channel.send(" ".join(args[1:-1]))
+    return
+
   # bla bla access granted thingy
   emb = discord.Embed(
     title=
