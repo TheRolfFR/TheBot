@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import discord
+from discord.ext import commands
 import asyncio
 
 import googletrans
 
+import api
 import keep_alive
 
 from settings import *
@@ -21,13 +23,14 @@ from commands.sudo import *
 global voicePlayers
 voicePlayers = PlayerList()
 
-class UTBot (discord.Client):
+class UTBot (commands.Bot):
 	def __init__(self, prefix, *args, **kwargs):
 		self.launchtime = 0
 		self.prefix = prefix
-		super().__init__(*args, **kwargs)
+		super().__init__(command_prefix=prefix, description='Default command operator', intents=kwargs['intents'])
 	
 	def run(self):
+		api.setup(self)
 		super().run(self.read_token())
 
 		print("-----------------------------")
@@ -66,10 +69,7 @@ class UTBot (discord.Client):
 			text = {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS}[command].__doc__
 		return discord.Embed(title=f"Aide sur {command}", description=text.format(bot_prefix=self.prefix), color=color)
 
-my_intents = discord.Intents.default()
-my_intents.guilds = True
-my_intents.members = True
-my_intents.voice_states = True
+my_intents = discord.Intents.all()
 bot = UTBot(PREFIX, intents=my_intents)
 
 @bot.event
