@@ -15,6 +15,7 @@ from .player.youtube import cmd_youtube
 from .gif.cfaux import cmd_cfaux
 from .gif.cvrai import cmd_cvrai
 from .gif.ghis import cmd_ghis
+from .gif.evilghis import cmd_evilghis
 from .rageux import cmd_rageux
 
 BOT_COMMANDS = {
@@ -43,6 +44,7 @@ BOT_COMMANDS = {
 BOT_SPECIAL_COMMANDS = {
     "cfaux": cmd_cfaux,
     "cvrai": cmd_cvrai,
+    "evilghis": cmd_evilghis,
     "ghis": cmd_ghis,
     "rageux": cmd_rageux
 }

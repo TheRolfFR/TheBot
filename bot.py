@@ -23,6 +23,8 @@ from commands.sudo import *
 global voicePlayers
 voicePlayers = PlayerList()
 
+API = os.getenv('API', False)
+
 class UTBot (commands.Bot):
 	def __init__(self, prefix, *args, **kwargs):
 		self.launchtime = 0
@@ -30,7 +32,8 @@ class UTBot (commands.Bot):
 		super().__init__(command_prefix=prefix, description='Default command operator', intents=kwargs['intents'])
 	
 	def run(self):
-		api.setup(self)
+		if API:
+			api.setup(self)
 		super().run(self.read_token())
 
 		print("-----------------------------")

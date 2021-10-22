@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .text_property import TextProperty
 from PIL import ImageDraw
@@ -83,6 +83,22 @@ class GIFCreator:
 
     text_properties.render(self.images[self.index], d, x, y, text)
     return
+
+  def invert(self):
+    im = self.images[self.index]
+
+    # force convert to RGB to invert colors
+    mode = im.mode
+    if im.mode != 'RGB':
+      im = im.convert('RGB')
+    
+    # invert current image
+    im = ImageOps.invert(im)
+
+    if mode != im.mode:
+      im = im.convert(mode)
+
+    self.images[self.index] = im
 
   def draw(self):
     return ImageDraw.Draw(self.images[self.index], "RGBA")
