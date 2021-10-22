@@ -7,7 +7,7 @@ import os
 from .gifcreator import GIFCreator
 from .gifcreator.text_property import TextProperty
 
-GHIS_CAPTION = "ET QUE MEURT"
+GHIS_CAPTION = "Et que meure"
 GHIS_CAPTION_PADDING = 6
 GHIS_CAPTION_BACKGROUND = (0, 0, 0, int(20))
 GHIS_FONT_SIZE = 52
