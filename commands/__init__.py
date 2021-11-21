@@ -11,6 +11,7 @@ from .mod import cmd_hardlog
 from .rename import cmd_rename
 from .larousse import cmd_larousse
 from .player.youtube import cmd_youtube
+from .mc import cmd_mc
 
 from .gif.cfaux import cmd_cfaux
 from .gif.cvrai import cmd_cvrai
@@ -29,6 +30,7 @@ BOT_COMMANDS = {
     "larousse": cmd_larousse,
     "logout": cmd_logout,
     "ping": cmd_ping,
+    "mc": cmd_mc,
     "radio": cmd_radio,
     "rank": cmd_rank,
     "ranks": cmd_ranks,
