@@ -18,6 +18,7 @@ from .gif.cvrai import cmd_cvrai
 from .gif.ghis import cmd_ghis
 from .gif.evilghis import cmd_evilghis
 from .rageux import cmd_rageux
+from .powered import cmd_powered
 
 BOT_COMMANDS = {
     "addrole": cmd_add_role,
@@ -48,5 +49,6 @@ BOT_SPECIAL_COMMANDS = {
     "cvrai": cmd_cvrai,
     "evilghis": cmd_evilghis,
     "ghis": cmd_ghis,
-    "rageux": cmd_rageux
+    "rageux": cmd_rageux,
+    "powered": cmd_powered
 }
