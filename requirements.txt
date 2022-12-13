@@ -16,4 +16,4 @@ mojang
 GitPython
 python-dotenv
 youtube_dl
-mojang
+mojang==1.0.0
