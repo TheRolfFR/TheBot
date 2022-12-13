@@ -1,5 +1,5 @@
 import discord
-from mojang import MojangAPI
+from mojang import API as MojangAPI
 
 import requests, json
 from settings import *
