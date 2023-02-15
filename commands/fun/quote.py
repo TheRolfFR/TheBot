@@ -1,3 +1,4 @@
+import uuid
 import os
 from settings import *
 
@@ -74,10 +75,10 @@ async def cmd_quote(bot, message, command, args):
     quote = quote.replace("\\n", "\n")
 
     #* Create clips
-    quote = split_line_by_width(quote, WIDTH, "Times-New-Roman-Italic", QUOTE_TEXT_SIZE)
-    quoteTextClip = TextClip(quote,color='white', font="Times-New-Roman-Italic", fontsize=QUOTE_TEXT_SIZE)
+    quote = split_line_by_width(quote, WIDTH, "Times-Italic", QUOTE_TEXT_SIZE)
+    quoteTextClip = TextClip(quote,color='white', font="Times-Italic", fontsize=QUOTE_TEXT_SIZE)
     
-    nameTextClip = TextClip(author, color='white', font='Times-New-Roman', fontsize=AUTHOR_TEXT_SIZE)
+    nameTextClip = TextClip(author, color='white', font='Times-Roman', fontsize=AUTHOR_TEXT_SIZE)
     cutAudioClip: AudioFileClip = AudioFileClip(os.path.join(os.getcwd(), "resources", "vivaldi_4_saisons.wav")).subclip(0,DURATION)
     quoteTextClip.audio = cutAudioClip
 
@@ -91,9 +92,8 @@ async def cmd_quote(bot, message, command, args):
     await message.add_reaction("💾")
 
     #* Open and close file pointer as quick as possible
-    fp = tempfile.TemporaryFile(prefix='quote-', suffix='.mp4')
-    finalClipPath = str(fp.name)
-    fp.close()
+    finalClipPath = '{}.mp4'.format(str(uuid.uuid4().hex))
+    print("Storing quote in " + finalClipPath)
 
     finalClipName = os.path.basename(finalClipPath)
     

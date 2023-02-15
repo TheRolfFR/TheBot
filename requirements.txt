@@ -17,3 +17,5 @@ python-dotenv
 youtube_dl
 mojang==1.0.0
 moviepy
+uuid
+
