@@ -15,7 +15,7 @@ urllib3==1.26.14
 GitPython
 python-dotenv
 youtube_dl
-mojang==1.0.0
+mojang==1.1.0
 moviepy
 uuid
 
