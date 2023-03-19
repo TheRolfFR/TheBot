@@ -1,50 +1,52 @@
 class PlayerSource:
-  def __init__(self, display_name: str, path: str):
-    self.display_name = str(display_name)
-    self.path = str(path)
+    def __init__(self, display_name: str, path: str):
+        self.display_name = str(display_name)
+        self.path = str(path)
 
-  def __eq__(self, o):
-    """== operator overload"""
+    def __eq__(self, o):
+        """== operator overload"""
 
-    # compare fields if string, can be used for search
-    if isinstance(o, str):
-      return o == self.path or o == self.display_name
+        # compare fields if string, can be used for search
+        if isinstance(o, str):
+            return o == self.path or o == self.display_name
 
-    # else if not radio description don't even try
-    if not isinstance(o, PlayerSource):
-      raise NotImplementedError("Cannot compare PlayerSource with " + type(o).__name__)
-      
-    # compare strictly all the fields
-    return self.path == o.path and self.display_name == o.display_name
+        # else if not radio description don't even try
+        if not isinstance(o, PlayerSource):
+            raise NotImplementedError(
+                "Cannot compare PlayerSource with " + type(o).__name__
+            )
 
-  def after(self, player):
-    return lambda *args, **kwargs: None
+        # compare strictly all the fields
+        return self.path == o.path and self.display_name == o.display_name
 
-  def source(self):
-    return None
+    def after(self, player):
+        return lambda *args, **kwargs: None
 
-  def duration(self):
-    """
-      Returns duration in seconds
-    """
-    return -1
+    def source(self):
+        return None
 
-  def progress(self):
-    """
-      Returns current playing progress in seconds
-    """
-    return -1
+    def duration(self):
+        """
+        Returns duration in seconds
+        """
+        return -1
 
-  def on_pause(self):
-    return
+    def progress(self):
+        """
+        Returns current playing progress in seconds
+        """
+        return -1
 
-  def on_resume(self):
-    return
+    def on_pause(self):
+        return
 
-  def __ne__(self, o):
-    """!= oeprator overload"""
-    return not self.__eq__(o)
+    def on_resume(self):
+        return
 
-  def __str__(self):
-    """str() operator overload"""
-    return "Nom: ``{0}``".format(self.display_name)
+    def __ne__(self, o):
+        """!= oeprator overload"""
+        return not self.__eq__(o)
+
+    def __str__(self):
+        """str() operator overload"""
+        return "Nom: ``{0}``".format(self.display_name)

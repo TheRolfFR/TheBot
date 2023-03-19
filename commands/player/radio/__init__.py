@@ -9,22 +9,26 @@ from os.path import join, dirname
 from commands.player import PlayerList
 import re
 
-RADIO_LIST_PATH = join(dirname(__file__), 'radiolist.py')
+RADIO_LIST_PATH = join(dirname(__file__), "radiolist.py")
 
 regexp_url = re.compile(
-  r'^(?:http|ftp)s?://' # http:// or https://
-  r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-  r'localhost|' #localhost...
-  r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-  r'(?::\d+)?' # optional port
-  r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    r"^(?:http|ftp)s?://"  # http:// or https://
+    r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+    r"localhost|"  # localhost...
+    r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+    r"(?::\d+)?"  # optional port
+    r"(?:/?|[/?]\S+)$",
+    re.IGNORECASE,
+)
+
 
 def get_radio_list():
     """Dynamically imports radio list"""
 
     exec(open(RADIO_LIST_PATH).read())
 
-    return locals()['radioList']
+    return locals()["radioList"]
+
 
 def find_radio(alias: str):
     """Find radio description if"""
@@ -37,12 +41,19 @@ def find_radio(alias: str):
     while i < len(radioList) and result is None:
         if radioList[i] == alias:
             result = radioList[i]
-        
+
         i += 1
-    
+
     return result
 
-async def cmd_radio(bot: discord.Client, message: discord.Message, command: str, args: list, voicePlayers: PlayerList):
+
+async def cmd_radio(
+    bot: discord.Client,
+    message: discord.Message,
+    command: str,
+    args: list,
+    voicePlayers: PlayerList,
+):
     """
     `{bot_prefix}radio` : affiche la liste des radios
     `{bot_prefix}radio list` : affiche la liste des radios
@@ -54,48 +65,52 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
     `{bot_prefix}radio volume <volume [0:100]>` : Change le volume de la radio
     """
 
-    if not args: # if no args list radios
+    if not args:  # if no args list radios
         theList = "**Liste des radios :**"
 
         # hot loading
         radioList = get_radio_list()
 
         for radio in radioList:
-            if radio != 'nggyu':
-                theList += f'\n{str(radio)}'
+            if radio != "nggyu":
+                theList += f"\n{str(radio)}"
         await message.channel.send(theList)
         return
 
-    if isinstance(args, list) and len(args) == 1: # pause resume or stop (actions while playing)
+    if (
+        isinstance(args, list) and len(args) == 1
+    ):  # pause resume or stop (actions while playing)
         # extract action
         action = args[0]
 
         # what you can do before all of this is display the list
-        if action == 'list':
+        if action == "list":
             await cmd_radio(bot, message, command, [], voicePlayers)
             return
         elif re.match(regexp_url, args[0]) is not None:
-            await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
+            await message.channel.send(
+                f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``"
+            )
             return
 
         # get player
         player = voicePlayers.get_player(message.guild)
 
         # do action
-        if action == 'playing':
+        if action == "playing":
             msg = "La radio n'est pas jouée actuellement"
 
             radio_name = player.name()
             channel_name = player.channel_name()
             if radio_name:
                 if player.is_paused():
-                    msg = f'La radio { radio_name } est pausée dans le salon { channel_name }'
+                    msg = f"La radio { radio_name } est pausée dans le salon { channel_name }"
                 else:
-                    msg = f'La radio { radio_name } est jouée dans le salon { channel_name }'
-            
+                    msg = f"La radio { radio_name } est jouée dans le salon { channel_name }"
+
             await message.channel.send(
                 embed=discord.Embed(
-                title="État de la radio",
+                    title="État de la radio",
                     color=CONFIRM_COLOR,
                     description=msg,
                 )
@@ -111,34 +126,36 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
         # if bot not in voice channel
         if not message.guild.voice_client:
             return
-        
+
         # if bot not in same voice channel
         if message.guild.voice_client.channel != message.author.voice.channel:
             return
-        
-        if action == 'pause':
+
+        if action == "pause":
             player.pause()
-        elif action == 'resume':
+        elif action == "resume":
             player.resume()
-        elif action == 'stop':
+        elif action == "stop":
             await player.stop()
-        
-        #exit da fuck outa here
+
+        # exit da fuck outa here
         return
 
     if isinstance(args, list) and len(args) == 2:
-        if args[0] == 'play': # play a radio
+        if args[0] == "play":  # play a radio
             # get radio alias
             alias = str(args[1])
 
             if re.match(regexp_url, alias) is not None:
-                await message.channel.send(f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``")
+                await message.channel.send(
+                    f"Désolé la radio ne prend que des noms de radio, pas d'URLs: ``{bot.prefix}radio play <nom de la radio>``"
+                )
                 return
 
             # search for radio
             radio_desc = find_radio(alias)
 
-            if radio_desc == 'nggyu' and message.author.id != CREATOR_ID:
+            if radio_desc == "nggyu" and message.author.id != CREATOR_ID:
                 radio_desc = None
 
             if not isinstance(radio_desc, RadioDescription):
@@ -146,7 +163,7 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
                     embed=discord.Embed(
                         title="Nom de radio incorrect",
                         color=ERROR_COLOR,
-                        description= f"{ message.author.mention }, impossible de trouver la radio {alias}"
+                        description=f"{ message.author.mention }, impossible de trouver la radio {alias}",
                     )
                 )
                 await cmd_radio(bot, message, command, [], voicePlayers)
@@ -157,7 +174,8 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
                 error = await message.channel.send(
                     embed=discord.Embed(
                         color=ERROR_COLOR,
-                        description=message.author.mention + ", tu n'es pas dans un channel audio.",
+                        description=message.author.mention
+                        + ", tu n'es pas dans un channel audio.",
                     )
                 )
                 await asyncio.sleep(2)
@@ -173,8 +191,14 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
             # play radio
             await player.play(radio_desc)
 
-            if radio_desc != 'nggyu':
-                await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f'Démarrage de {player.source.display_name} dans { player.channel_name() }...'))
+            if radio_desc != "nggyu":
+                await message.channel.send(
+                    embed=discord.Embed(
+                        title="Radio",
+                        color=CONFIRM_COLOR,
+                        description=f"Démarrage de {player.source.display_name} dans { player.channel_name() }...",
+                    )
+                )
             else:
                 await message.delete()
         elif args[0] == "volume":
@@ -194,4 +218,10 @@ async def cmd_radio(bot: discord.Client, message: discord.Message, command: str,
                 await error.delete()
                 return
 
-            await message.channel.send(embed=discord.Embed(title="Radio", color=CONFIRM_COLOR, description=f':speaker: Changement du volume de la radio à { player.volume } %'))
+            await message.channel.send(
+                embed=discord.Embed(
+                    title="Radio",
+                    color=CONFIRM_COLOR,
+                    description=f":speaker: Changement du volume de la radio à { player.volume } %",
+                )
+            )

@@ -4,145 +4,185 @@ from PIL import ImageFont, ImageDraw, ImageOps
 
 # url and download emojis
 import requests
-from io  import BytesIO
+from io import BytesIO
 
-EMOJI_REGEX = re.compile('(<:[^:]+:([0-9]+)>)')
+EMOJI_REGEX = re.compile("(<:[^:]+:([0-9]+)>)")
+
 
 def _emoji_size(fontSize):
-  return int(fontSize * 22 / 16)
+    return int(fontSize * 22 / 16)
 
-def _drawLine(img: Image.Image, d: ImageDraw, offsetX: int, offsetY: int, line: str, font: ImageFont, fontSize, emojiDict: dict):
-  # find emojis
-  emojis = EMOJI_REGEX.findall(line)
 
-  emojiSize = _emoji_size(fontSize)
+def _drawLine(
+    img: Image.Image,
+    d: ImageDraw,
+    offsetX: int,
+    offsetY: int,
+    line: str,
+    font: ImageFont,
+    fontSize,
+    emojiDict: dict,
+):
+    # find emojis
+    emojis = EMOJI_REGEX.findall(line)
 
-  (lineWidth, lineHeight) = d.textsize('EXAMPLE', font = font)
+    emojiSize = _emoji_size(fontSize)
 
-  # split line by emojis, really complicated because we need everything
-  linearr = []
-  linelast = line
-  if len(emojis):
-    for i in range(len(emojis)):
-      explode = linelast.split(emojis[i][0], 1)
-      linelast = explode[1]
-      linearr.append(explode[0]) # add first part
-      linearr.append(int(emojis[i][1])) # add emoji number after
-  
-  # else there is no emoji just append the line or lastline
-  linearr.append(linelast)
+    (lineWidth, lineHeight) = d.textsize("EXAMPLE", font=font)
 
-  # draw
-  for element in linearr:
-    if isinstance(element, int):
-      if not element in emojiDict:
-        # load emoji
-        response = requests.get('https://cdn.discordapp.com/emojis/' + str(element) + '.png')
-        ori = Image.open(BytesIO(response.content))
-        orisize = ori.size
-        finalSize = (int(orisize[0]/max(orisize)*emojiSize), int(orisize[1]/max(orisize)*emojiSize))
-        emojiDict[element] = ori.resize(finalSize, Image.BICUBIC)
+    # split line by emojis, really complicated because we need everything
+    linearr = []
+    linelast = line
+    if len(emojis):
+        for i in range(len(emojis)):
+            explode = linelast.split(emojis[i][0], 1)
+            linelast = explode[1]
+            linearr.append(explode[0])  # add first part
+            linearr.append(int(emojis[i][1]))  # add emoji number after
 
-      # paste emoji
-      img.paste(emojiDict[element], (int(offsetX), int(offsetY)), emojiDict[element])
-      offsetX += emojiSize
-    else:
-      # it's text
-      (lineWidth, lineHeight) = d.textsize(element, font = font)
-      d.text((offsetX, offsetY), element, font = font)
-      offsetX += lineWidth
+    # else there is no emoji just append the line or lastline
+    linearr.append(linelast)
 
-  return (offsetY + (max(emojiSize, lineHeight) if len(emojis) else lineHeight), emojiDict)
+    # draw
+    for element in linearr:
+        if isinstance(element, int):
+            if not element in emojiDict:
+                # load emoji
+                response = requests.get(
+                    "https://cdn.discordapp.com/emojis/" + str(element) + ".png"
+                )
+                ori = Image.open(BytesIO(response.content))
+                orisize = ori.size
+                finalSize = (
+                    int(orisize[0] / max(orisize) * emojiSize),
+                    int(orisize[1] / max(orisize) * emojiSize),
+                )
+                emojiDict[element] = ori.resize(finalSize, Image.BICUBIC)
+
+            # paste emoji
+            img.paste(
+                emojiDict[element], (int(offsetX), int(offsetY)), emojiDict[element]
+            )
+            offsetX += emojiSize
+        else:
+            # it's text
+            (lineWidth, lineHeight) = d.textsize(element, font=font)
+            d.text((offsetX, offsetY), element, font=font)
+            offsetX += lineWidth
+
+    return (
+        offsetY + (max(emojiSize, lineHeight) if len(emojis) else lineHeight),
+        emojiDict,
+    )
+
 
 class TextProperty:
-  def __init__(self, **kwargs):
-    self.backgroundColor = kwargs["backgroundColor"] if "backgroundColor" in kwargs else None
+    def __init__(self, **kwargs):
+        self.backgroundColor = (
+            kwargs["backgroundColor"] if "backgroundColor" in kwargs else None
+        )
 
-    self.fontPath = kwargs["fontPath"]
-    self.fontSize = kwargs["fontSize"]
+        self.fontPath = kwargs["fontPath"]
+        self.fontSize = kwargs["fontSize"]
 
-    self.color = kwargs["color"]
+        self.color = kwargs["color"]
 
-    self.backgroundMargin = kwargs["backgroundMargin"] if "backgroundMargin" in kwargs else 0
+        self.backgroundMargin = (
+            kwargs["backgroundMargin"] if "backgroundMargin" in kwargs else 0
+        )
 
-    self.alignment = kwargs["alignment"] if "alignment" in kwargs else "left"
+        self.alignment = kwargs["alignment"] if "alignment" in kwargs else "left"
 
-    _preload_font = kwargs["preloadFont"] if "preloadFont" in kwargs else False
-    self.font = None
-    self.realFontSize = None
+        _preload_font = kwargs["preloadFont"] if "preloadFont" in kwargs else False
+        self.font = None
+        self.realFontSize = None
 
-    self.boxSize = kwargs["boxSize"] if "boxSize" in kwargs else (-1, -1)
+        self.boxSize = kwargs["boxSize"] if "boxSize" in kwargs else (-1, -1)
 
-    if _preload_font:
-      self.preloadFont()
+        if _preload_font:
+            self.preloadFont()
 
-  def computeFontSize(self):
-    return self.fontSize
+    def computeFontSize(self):
+        return self.fontSize
 
-  def preloadFont(self):
-    self.realFontSize = self.computeFontSize()
-    self.font = self.loadFont(self.fontPath, self.realFontSize)
+    def preloadFont(self):
+        self.realFontSize = self.computeFontSize()
+        self.font = self.loadFont(self.fontPath, self.realFontSize)
 
-  def loadFont(self, path: str, size: float):
-    if self.font is None:
-      if path.endswith("ttf"):
-        return ImageFont.truetype(path, size)
-      return ImageFont.load_default()
-    
-    return self.font
+    def loadFont(self, path: str, size: float):
+        if self.font is None:
+            if path.endswith("ttf"):
+                return ImageFont.truetype(path, size)
+            return ImageFont.load_default()
 
-  def computeSize(self, draw, text: str):
-    """Computes size of render"""
-    lines = text.split("\\n")
+        return self.font
 
-    _font_size = self.computeFontSize()
-    _font = self.loadFont(self.fontPath, _font_size)
+    def computeSize(self, draw, text: str):
+        """Computes size of render"""
+        lines = text.split("\\n")
 
-    height = 0
-    maxWidth = 0
+        _font_size = self.computeFontSize()
+        _font = self.loadFont(self.fontPath, _font_size)
 
-    emojiSize = _emoji_size(_font_size)
+        height = 0
+        maxWidth = 0
 
-    for line in lines:
-      # find emojis
-      emojis = EMOJI_REGEX.findall(line)
+        emojiSize = _emoji_size(_font_size)
 
-      # create a pure line
-      pureLine = line
-      for emojiMatch in emojis:
-        pureLine = pureLine.replace(emojiMatch[0], '') # remove da fuck out of the line
+        for line in lines:
+            # find emojis
+            emojis = EMOJI_REGEX.findall(line)
 
-      (lineWidth, lineHeight) = draw.textsize(pureLine, font = _font)
+            # create a pure line
+            pureLine = line
+            for emojiMatch in emojis:
+                pureLine = pureLine.replace(
+                    emojiMatch[0], ""
+                )  # remove da fuck out of the line
 
-      # you need to take into account the emojis width
-      lineWidth += emojiSize * len(emojis)
+            (lineWidth, lineHeight) = draw.textsize(pureLine, font=_font)
 
-      maxWidth = max(maxWidth, lineWidth)
-      height += max(emojiSize, lineHeight) if len(emojis) else lineHeight # get max if emojis present in line
+            # you need to take into account the emojis width
+            lineWidth += emojiSize * len(emojis)
 
-    return (maxWidth, height)
+            maxWidth = max(maxWidth, lineWidth)
+            height += (
+                max(emojiSize, lineHeight) if len(emojis) else lineHeight
+            )  # get max if emojis present in line
 
-  def render(self, img: Image.Image, draw: ImageDraw, x:int, y: int, text: str):
-    lines = text.split("\\n")
+        return (maxWidth, height)
 
-    if self.font is None:
-      self.preloadFont()
+    def render(self, img: Image.Image, draw: ImageDraw, x: int, y: int, text: str):
+        lines = text.split("\\n")
 
-    _emoji_dict = {}
-    _font_size = self.computeFontSize()
+        if self.font is None:
+            self.preloadFont()
 
-    entire_size = self.computeSize(draw, text)
+        _emoji_dict = {}
+        _font_size = self.computeFontSize()
 
-    for line in lines:
-      (line_width, line_height) = self.computeSize(draw, line)
+        entire_size = self.computeSize(draw, text)
 
-      if self.alignment == "center":
-        x = x - int(entire_size[0]/2)
+        for line in lines:
+            (line_width, line_height) = self.computeSize(draw, line)
 
-      # draw background
-      if self.backgroundColor is not None:
-        draw.rectangle((x - self.backgroundMargin, y - self.backgroundMargin, x+line_width + 2*self.backgroundMargin, y+line_height + 2*self.backgroundMargin), self.backgroundColor)
+            if self.alignment == "center":
+                x = x - int(entire_size[0] / 2)
 
-      # draw text
-      (y, _emoji_dict) = _drawLine(img, draw, x, y, line, self.font, self.realFontSize, _emoji_dict)
-    return
+            # draw background
+            if self.backgroundColor is not None:
+                draw.rectangle(
+                    (
+                        x - self.backgroundMargin,
+                        y - self.backgroundMargin,
+                        x + line_width + 2 * self.backgroundMargin,
+                        y + line_height + 2 * self.backgroundMargin,
+                    ),
+                    self.backgroundColor,
+                )
+
+            # draw text
+            (y, _emoji_dict) = _drawLine(
+                img, draw, x, y, line, self.font, self.realFontSize, _emoji_dict
+            )
+        return
