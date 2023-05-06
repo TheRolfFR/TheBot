@@ -3,167 +3,181 @@ import json
 from os import makedirs
 from os.path import abspath, join, dirname
 
+
 def get_settings_folder_path(guild_id: int):
-  return abspath(join(dirname(__file__), '..', '..', 'data', str(guild_id)))
+    return abspath(join(dirname(__file__), "..", "..", "data", str(guild_id)))
+
 
 def get_settings_path(guild_id: int):
-  return join(get_settings_folder_path(guild_id), 'settings.json')
+    return join(get_settings_folder_path(guild_id), "settings.json")
+
 
 def get_setting(guild_id: int, field: str):
-  set_path = get_settings_path(guild_id)
+    set_path = get_settings_path(guild_id)
 
-  settings = {}
-  try:
-    f = open(set_path, 'r')
-    raw = f.read()
-    f.close()
+    settings = {}
+    try:
+        f = open(set_path, "r")
+        raw = f.read()
+        f.close()
 
-    settings_json = json.loads(raw)
-    settings = settings_json
-  except Exception as e:
-    # print("Error while reading current settings")
-    # print(e)
+        settings_json = json.loads(raw)
+        settings = settings_json
+    except Exception as e:
+        # print("Error while reading current settings")
+        # print(e)
+        return None
+
+    # get value
+    if field in settings:
+        return settings[field]
+
     return None
 
-  # get value
-  if field in settings:
-    return settings[field]
-
-  return None
 
 def set_setting(guild_id: int, field: str, value: any):
-  set_path = get_settings_path(guild_id)
+    set_path = get_settings_path(guild_id)
 
-  settings = {}
-  try:
-    f = open(set_path, 'r')
-    raw = f.read()
-    f.close()
+    settings = {}
+    try:
+        f = open(set_path, "r")
+        raw = f.read()
+        f.close()
 
-    settings_json = json.loads(raw)
-    settings = settings_json
-  except Exception as e:
-    # print("Error while reading settings file to write them")
-    # print(e)
-    pass
+        settings_json = json.loads(raw)
+        settings = settings_json
+    except Exception as e:
+        # print("Error while reading settings file to write them")
+        # print(e)
+        pass
 
-  # apply value
-  settings[field] = value
+    # apply value
+    settings[field] = value
 
-  try:
-    makedirs(get_settings_folder_path(guild_id), exist_ok = True)
+    try:
+        makedirs(get_settings_folder_path(guild_id), exist_ok=True)
 
-    f = open(set_path, 'w')
-    f.write(json.dumps(settings))
-    f.close()
-  except Exception as e:
-    print("Error while writing settings file")
-    print(e)
-    return
+        f = open(set_path, "w")
+        f.write(json.dumps(settings))
+        f.close()
+    except Exception as e:
+        print("Error while writing settings file")
+        print(e)
+        return
+
 
 class GuildSettingGroup:
-  """Guild setting group with key and items"""
-  __guild_id: int
-  __field: str
-  items: list
-  raw: any
+    """Guild setting group with key and items"""
 
-  def __init__(self, guild_id: int, field: str):
-    self.__field = field
-    self.__guild_id = guild_id
+    __guild_id: int
+    __field: str
+    items: list
+    raw: any
 
-    self.items = {}
+    def __init__(self, guild_id: int, field: str):
+        self.__field = field
+        self.__guild_id = guild_id
 
-    self.raw = get_setting(guild_id, field)
+        self.items = {}
 
-    if self.raw is None:
-      self.raw = {}
+        self.raw = get_setting(guild_id, field)
 
-  @property
-  def field(self):
-    """Key of the setting"""
-    return self.__field
+        if self.raw is None:
+            self.raw = {}
 
-  @field.setter
-  def field(self, val):
-    return
+    @property
+    def field(self):
+        """Key of the setting"""
+        return self.__field
 
-  @property
-  def guild_id(self):
-    """Guild ID of the setting"""
-    return self.__guild_id
+    @field.setter
+    def field(self, val):
+        return
 
-  @guild_id.setter
-  def guild_id(self, val):
-    return
+    @property
+    def guild_id(self):
+        """Guild ID of the setting"""
+        return self.__guild_id
 
-  def create_item(self, key: str, item_type: type, default:any=None):
-    """Get or create an item of the group"""
-    if key not in self.items:
-      self.items[key] = GuildSettingItem(self, key, item_type, default)
-    
-    return self.items[key]
-  
-  def save(self):
-    set_setting(self.__guild_id, self.__field, self.raw)
+    @guild_id.setter
+    def guild_id(self, val):
+        return
 
-  def __eq__(self, o):
-    """== operator overload"""
-    if isinstance(o, int):
-      return o == self.__guild_id
+    def create_item(self, key: str, item_type: type, default: any = None):
+        """Get or create an item of the group"""
+        if key not in self.items:
+            self.items[key] = GuildSettingItem(self, key, item_type, default)
 
-    return False
+        return self.items[key]
 
-  def __str__(self):
-    return self.raw
+    def save(self):
+        set_setting(self.__guild_id, self.__field, self.raw)
 
-  def __repr__(self):
-    return self.__str__()
+    def __eq__(self, o):
+        """== operator overload"""
+        if isinstance(o, int):
+            return o == self.__guild_id
+
+        return False
+
+    def __str__(self):
+        return self.raw
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class GuildSettingItem:
-  """Guild setting item interface with key, type and optional default value"""
-  __group: GuildSettingGroup
+    """Guild setting item interface with key, type and optional default value"""
 
-  __key: str
-  __type: type
-  __default: any
+    __group: GuildSettingGroup
 
-  def __init__(self, group: GuildSettingGroup, key: str, item_type: type, default:any=None):
-    self.__group = group
+    __key: str
+    __type: type
+    __default: any
 
-    self.__key = key
-    self.__type = item_type
-    self.__default = default
+    def __init__(
+        self, group: GuildSettingGroup, key: str, item_type: type, default: any = None
+    ):
+        self.__group = group
 
-    if not key in self.__group.raw:
-      self.__group.raw[key] = self.__default
+        self.__key = key
+        self.__type = item_type
+        self.__default = default
 
-  @property
-  def key(self):
-    """Key of the setting"""
-    return self.__key
+        if not key in self.__group.raw:
+            self.__group.raw[key] = self.__default
 
-  @key.setter
-  def key(self, val):
-    return
-  
-  @property
-  def value(self):
-    """Value of the setting"""
-    if self.__key in self.__group.raw and isinstance(self.__group.raw[self.__key], self.__type):
-      return self.__group.raw[self.__key]
-    
-    return self.__default
+    @property
+    def key(self):
+        """Key of the setting"""
+        return self.__key
 
-  @value.setter
-  def value(self, value: any):
-    if not isinstance(value, self.__type):
-      raise TypeError(f'Incorrect type, expected { self.__type }, got { type(value) }')
+    @key.setter
+    def key(self, val):
+        return
 
-    self.__group.raw[self.__key] = value
-  
-  def __str__(self):
-    return str(self.value)
+    @property
+    def value(self):
+        """Value of the setting"""
+        if self.__key in self.__group.raw and isinstance(
+            self.__group.raw[self.__key], self.__type
+        ):
+            return self.__group.raw[self.__key]
 
-  def __repr__(self):
-    return self.__str__()
+        return self.__default
+
+    @value.setter
+    def value(self, value: any):
+        if not isinstance(value, self.__type):
+            raise TypeError(
+                f"Incorrect type, expected { self.__type }, got { type(value) }"
+            )
+
+        self.__group.raw[self.__key] = value
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return self.__str__()

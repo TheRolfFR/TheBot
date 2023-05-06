@@ -39,10 +39,10 @@ BOT_COMMANDS = {
     "rename": cmd_rename,
     "roles": cmd_roles,
     "roleinfo": cmd_role_info,
-    "stats" : cmd_stats,
+    "stats": cmd_stats,
     "trad": cmd_trad,
     "uptime": cmd_uptime,
-    "youtube": cmd_youtube
+    "youtube": cmd_youtube,
 }
 
 BOT_SPECIAL_COMMANDS = {
@@ -52,5 +52,5 @@ BOT_SPECIAL_COMMANDS = {
     "ghis": cmd_ghis,
     "rageux": cmd_rageux,
     "powered": cmd_powered,
-    "quote": cmd_quote
+    "quote": cmd_quote,
 }

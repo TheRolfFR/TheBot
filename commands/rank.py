@@ -7,9 +7,9 @@ import re
 
 async def cmd_add_rank(bot, message, command, args):
     """
-	Usage : `{bot_prefix}addrank <nom du rang> [couleur hexadécimal]`
-	Ajoute un nouveau rang
-	"""
+    Usage : `{bot_prefix}addrank <nom du rang> [couleur hexadécimal]`
+    Ajoute un nouveau rang
+    """
 
     ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
 
@@ -73,9 +73,9 @@ async def cmd_add_rank(bot, message, command, args):
 
 async def cmd_rank(bot, message, command, args):
     """
-	Usage : `{bot_prefix}rank <nom du rang>`
-	Rejoindre ou partir d'un rang
-	"""
+    Usage : `{bot_prefix}rank <nom du rang>`
+    Rejoindre ou partir d'un rang
+    """
 
     pattern = "^=rank (.*)"
     if not re.search(pattern, message.content):
@@ -125,9 +125,9 @@ async def cmd_rank(bot, message, command, args):
 
 async def cmd_ranks(bot, message, command, args):
     """
-	Usage : `{bot_prefix}ranks`
-	Affiche la liste des rangs
-	"""
+    Usage : `{bot_prefix}ranks`
+    Affiche la liste des rangs
+    """
 
     if len(args) != 0:
         await message.channel.send(embed=bot.doc_embed("ranks", ERROR_COLOR))
@@ -151,9 +151,9 @@ async def cmd_ranks(bot, message, command, args):
 
 async def cmd_del_rank(bot, message, command, args):
     """
-	Usage : `{bot_prefix}delrank <nom du rang>`
-	Supprime un rang
-	"""
+    Usage : `{bot_prefix}delrank <nom du rang>`
+    Supprime un rang
+    """
 
     ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
 
@@ -202,9 +202,9 @@ async def cmd_del_rank(bot, message, command, args):
 
 async def cmd_roles(bot, message, command, args):
     """
-	Usage : `{bot_prefix}roles`
-	Affiche la liste des roles
-	"""
+    Usage : `{bot_prefix}roles`
+    Affiche la liste des roles
+    """
 
     ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
 
@@ -239,34 +239,41 @@ async def cmd_roles(bot, message, command, args):
 
 
 async def cmd_role_info(bot, message, command, args):
-  """
-	Usage : `{bot_prefix}roleinfo <nom du role>`
-	Donne les informations du role
-	"""
-  # role name is all the args
-  role_name = " ".join(args)
+    """
+    Usage : `{bot_prefix}roleinfo <nom du role>`
+    Donne les informations du role
+    """
+    # role name is all the args
+    role_name = " ".join(args)
 
-  # getting role from name
-  ds_role = discord.utils.get(message.guild.roles, name=role_name)
+    # getting role from name
+    ds_role = discord.utils.get(message.guild.roles, name=role_name)
 
-  if ds_role:
-      embed = discord.Embed(title=f"{role_name}", color=ds_role.colour)
-      embed.add_field(name="Nombre de personnes", value=len(ds_role.members), inline=False)
-      embed.add_field(name="Couleur", value=str(ds_role.colour).upper(), inline=False)
-      embed.add_field(name="Date de création", value=ds_role.created_at.strftime("%m/%d/%Y, %H:%M:%S"), inline=False)
-      await message.channel.send(embed=embed)
-  else:
-      await message.channel.send(
-          embed=discord.Embed(
-              description=f"Le role {role_name} n'existe pas", color=ERROR_COLOR
-          )
-      )
+    if ds_role:
+        embed = discord.Embed(title=f"{role_name}", color=ds_role.colour)
+        embed.add_field(
+            name="Nombre de personnes", value=len(ds_role.members), inline=False
+        )
+        embed.add_field(name="Couleur", value=str(ds_role.colour).upper(), inline=False)
+        embed.add_field(
+            name="Date de création",
+            value=ds_role.created_at.strftime("%m/%d/%Y, %H:%M:%S"),
+            inline=False,
+        )
+        await message.channel.send(embed=embed)
+    else:
+        await message.channel.send(
+            embed=discord.Embed(
+                description=f"Le role {role_name} n'existe pas", color=ERROR_COLOR
+            )
+        )
+
 
 async def cmd_add_role(bot, message, command, args):
     """
-	Usage : `{bot_prefix}addrole <nom du role> [couleur hexadécimal]`
-	Ajoute un nouveau role
-	"""
+    Usage : `{bot_prefix}addrole <nom du role> [couleur hexadécimal]`
+    Ajoute un nouveau role
+    """
 
     ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
 

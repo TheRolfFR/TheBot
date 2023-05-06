@@ -7,9 +7,9 @@ from utility import convert_dhms
 
 async def cmd_uptime(bot, message, command, args):
     """
-	Usage : `{bot_prefix}uptime`
-	Renvoie le temps écoulé depuis le lancement du bot
-	"""
+    Usage : `{bot_prefix}uptime`
+    Renvoie le temps écoulé depuis le lancement du bot
+    """
     jours, heures, minutes, secondes = convert_dhms(bot.uptime())
     print("-----------------------------")
     print("Temps écoulé")
@@ -25,9 +25,9 @@ async def cmd_uptime(bot, message, command, args):
 
 async def cmd_ping(bot, message, command, args):
     """
-	Usage : `{bot_prefix}ping`
-	Renvoie la latence du bot
-	"""
+    Usage : `{bot_prefix}ping`
+    Renvoie la latence du bot
+    """
     ping = round(bot.latency * 1000)
     await message.channel.send(
         embed=discord.Embed(
@@ -39,9 +39,9 @@ async def cmd_ping(bot, message, command, args):
 
 async def cmd_logout(bot, message, command, args):
     """
-	Usage : `{bot_prefix}logout`
-	Déconnecte le bot
-	"""
+    Usage : `{bot_prefix}logout`
+    Déconnecte le bot
+    """
 
     ds_role = discord.utils.get(message.guild.roles, name="lvl 30 SNAIL")
 
@@ -54,7 +54,7 @@ async def cmd_logout(bot, message, command, args):
             )
         )
         return
-    
+
     # disconnects bot from every audio channel
     for index in range(len(bot.voice_clients)):
         vc = bot.voice_clients[index]
@@ -73,4 +73,3 @@ async def cmd_logout(bot, message, command, args):
     await message.delete()
     await alert.delete()
     await bot.logout()
-
