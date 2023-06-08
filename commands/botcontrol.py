@@ -2,6 +2,7 @@ import discord
 import asyncio
 
 from settings import *
+from discord.ext.commands import Context, Bot
 from utility import convert_dhms
 
 
@@ -23,16 +24,21 @@ async def cmd_uptime(bot, message, command, args):
     )
 
 
-async def cmd_ping(bot, message, command, args):
+async def cmd_ping(bot: Context|Bot, message=None, command=None, args=None):
     """
     Usage : `{bot_prefix}ping`
     Renvoie la latence du bot
     """
-    ping = round(bot.latency * 1000)
+    latency = bot.bot.latency if isinstance(bot, Context) else bot.latency
+    ping = round(latency * 1000)
+    message = message if (message is not None) else bot.message
+
+    desc = f"**Ma latence est de ``{ping}``ms** :ping_pong: "
+
     await message.channel.send(
         embed=discord.Embed(
             color=STATUS_COLOR,
-            description=f"**Ma latence est de ``{ping}``ms** :ping_pong: ",
+            description=desc,
         )
     )
 

@@ -141,6 +141,13 @@ async def cmd_help(bot, message, command, args):
             )
             await cmd_help(bot, message, command, [])
 
+def get_command_map(is_special: bool) -> dict[str, any]:
+    return (
+        {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS}
+        if is_special
+        else BOT_COMMANDS
+    )
+
 
 async def on_message(message):
     if message.author.id == bot.user.id:
@@ -152,11 +159,7 @@ async def on_message(message):
         command = commandtokens[0]
         args = commandtokens[1:]
 
-        command_map = (
-            {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS}
-            if message.guild.id in SPECIAL_SERVERS
-            else BOT_COMMANDS
-        )
+        command_map = get_command_map(message.guild.id in SPECIAL_SERVERS)
 
         if "\n" in command:
             firstindex = command.find("\n")

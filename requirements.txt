@@ -18,4 +18,5 @@ youtube_dl
 mojang==1.1.0
 moviepy
 uuid
-
+dpytest
+pytest
