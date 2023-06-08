@@ -19,12 +19,10 @@ from settings import *
 from commands import *
 from commands.mod import cmd_hardlog_update
 from commands.botupdate import *
-from commands.sudo import *
+from commands.sudo import COMMAND_SUDO_NAME, cmd_sudo
 
 global voicePlayers
 voicePlayers = PlayerList()
-
-API = os.getenv("API", False)
 
 
 class UTBot(commands.Bot):
@@ -83,11 +81,6 @@ class UTBot(commands.Bot):
         )
 
 
-my_intents = discord.Intents.all()
-bot = UTBot(PREFIX, intents=my_intents)
-
-
-@bot.event
 async def on_ready():
     await bot.change_presence(
         status=discord.Status.idle, activity=discord.Game(name="Démarrage..")
@@ -148,7 +141,6 @@ async def cmd_help(bot, message, command, args):
             await cmd_help(bot, message, command, [])
 
 
-@bot.event
 async def on_message(message):
     if message.author.id == bot.user.id:
         return  # Évite que le bot traite ses propres messages, en général optimisation mineure, mais ça peut éviter des soucis dans certains cas
@@ -193,7 +185,6 @@ async def on_message(message):
                 await command_map[command](bot, message, command, args)
 
 
-@bot.event
 async def on_message_edit(before, after):
     await on_message(after)
     await cmd_hardlog_update(
@@ -201,25 +192,33 @@ async def on_message_edit(before, after):
     )
 
 
-@bot.event
 async def on_voice_state_update(
     member: discord.Member, before: discord.VoiceState, after: discord.VoiceState
 ):
     await voicePlayers.update(member, before, after)
 
 
-@bot.event
 async def on_message_delete(message: discord.Message):
     await cmd_hardlog_update(
         bot=bot, message_original=message, message_edite=None, edit=False, delete=True
     )
 
 
-# start the server to stay alive
-if not os.getenv("DEV", False):
-    keep_alive.start()
+if __name__ == "__main__":
+    # start the server to stay alive
+    if not os.getenv("DEV", False):
+        keep_alive.start()
 
-bot.run()
+    API = os.getenv("API", False)
+
+    my_intents = discord.Intents.all()
+    bot = UTBot(PREFIX, intents=my_intents)
+    bot.event(on_ready)
+    bot.event(on_message)
+    bot.event(on_message_edit)
+    bot.event(on_voice_state_update)
+    bot.event(on_message_delete)
+    bot.run()
 
 # permission integer: 301067378
 # permission integer 8 is administrator

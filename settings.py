@@ -1,4 +1,10 @@
-PREFIX = "="
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+PREFIX = os.getenv("PREFIX", "=")
 
 HELP_COLOR = 0x55AAFF
 ERROR_COLOR = 0xFF4406

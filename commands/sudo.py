@@ -2,8 +2,6 @@ import discord
 import asyncio
 import os
 
-from commands.player.radio import cmd_radio
-
 from settings import *
 
 COMMAND_SUDO_NAME = "sudo"
@@ -71,6 +69,7 @@ async def cmd_sudo(
             message.mentions[0] if len(message.mentions) > 0 else message.author
         )
 
+        from commands.player.radio import cmd_radio
         cmd_radio(bot, message, ["play", "nggyu"], user_targeted, voicePlayers)
 
         emb.add_field(name="Action", value="Lancement du troll...", inline=False)

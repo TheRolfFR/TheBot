@@ -17,7 +17,7 @@ radioList = [
     ),
     RadioDescription(
         display_name="BFM Business",
-        url="http://chai5she.cdn.dvmr.fr/bfmbusiness",
+        url="   http://audio.bfmtv.com/bfmbusiness_128.mp3",
         aliases=["BFMBusiness", "bfmb"],
     ),
     RadioDescription(
@@ -57,7 +57,7 @@ radioList = [
     ),
     RadioDescription(
         display_name="OUIFM",
-        url="http://stream.ouifm.fr/ouifm-high.mp3",
+        url="http://ouifm.ice.infomaniak.ch/ouifm-high.mp3",
         aliases=["OUIFM"],
     ),
     RadioDescription(
