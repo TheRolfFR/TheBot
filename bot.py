@@ -36,6 +36,7 @@ class UTBot(commands.Bot):
         )
 
     def run(self):
+        API = os.getenv("API", False)
         if API:
             api.setup(self)
         super().run(self.read_token())
@@ -208,8 +209,6 @@ if __name__ == "__main__":
     # start the server to stay alive
     if not os.getenv("DEV", False):
         keep_alive.start()
-
-    API = os.getenv("API", False)
 
     my_intents = discord.Intents.all()
     bot = UTBot(PREFIX, intents=my_intents)

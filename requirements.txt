@@ -2,7 +2,7 @@ discord.py[voice]
 googletrans==3.1.0a0
 black
 sqlalchemy
-Pillow
+Pillow==9.*.*
 PyNaCl
 requests
 flask
