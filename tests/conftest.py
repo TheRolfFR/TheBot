@@ -20,7 +20,11 @@ def event_loop():
 def ctx_to_callback(func: CommandCallback):
     async def inner(ctx: Context):
         splitted = ctx.message.content[len(ctx.bot.prefix) :].split(" ")
-        func(ctx.bot, ctx.message, splitted[0], splitted[1:])
+        message = ctx.message
+        command = splitted[0]
+        args = splitted[1:]
+        bot = ctx.bot
+        await func(bot, message, command, args)
 
     return inner
 

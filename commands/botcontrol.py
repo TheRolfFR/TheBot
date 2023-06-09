@@ -1,4 +1,6 @@
+from typing import List
 import discord
+from discord import Message
 import asyncio
 
 from settings import *
@@ -24,15 +26,12 @@ async def cmd_uptime(bot, message, command, args):
     )
 
 
-async def cmd_ping(bot: Context|Bot, message=None, command=None, args=None):
+async def cmd_ping(bot: Bot, message: Message, command: str, args: List[str]):
     """
     Usage : `{bot_prefix}ping`
     Renvoie la latence du bot
     """
-    print("lol", "plop")
-    latency = bot.bot.latency if isinstance(bot, Context) else bot.latency
-    ping = round(latency * 1000)
-    message = message if (message is not None) else bot.message
+    ping = round(bot.latency * 1000)
 
     desc = f"**Ma latence est de ``{ping}``ms** :ping_pong: "
 
