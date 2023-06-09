@@ -29,6 +29,7 @@ async def cmd_ping(bot: Context|Bot, message=None, command=None, args=None):
     Usage : `{bot_prefix}ping`
     Renvoie la latence du bot
     """
+    print("lol", "plop")
     latency = bot.bot.latency if isinstance(bot, Context) else bot.latency
     ping = round(latency * 1000)
     message = message if (message is not None) else bot.message

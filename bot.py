@@ -1,6 +1,7 @@
 import time
 import asyncio
 import os
+from typing import Callable, List
 
 from dotenv import load_dotenv
 
@@ -141,7 +142,9 @@ async def cmd_help(bot, message, command, args):
             )
             await cmd_help(bot, message, command, [])
 
-def get_command_map(is_special: bool) -> dict[str, any]:
+CommandCallback = Callable[[discord.ext.commands.Bot, discord.Message, str, str|List[str]], None]
+
+def get_command_map(is_special: bool) -> dict[str, CommandCallback]:
     return (
         {**BOT_COMMANDS, **BOT_SPECIAL_COMMANDS}
         if is_special
