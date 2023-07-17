@@ -5,10 +5,16 @@ from settings import *
 
 import json
 import youtube_dl
+from youtube_dl.version import __version__ as ytdl_version
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import os
 from commands.player import PlayerList, PlayerSource, Player
 import re
+import sys
 
 import time
 from utility import convert_dhms_string
@@ -17,7 +23,10 @@ regexp_youtube_url = re.compile(
     r"""^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$""", re.IGNORECASE
 )
 
-ytdl_format_options = {"format": "bestaudio"}
+ytdl_format_options = {
+    "format": "bestaudio",
+    "verbose": os.getenv("DEV", "False") == "True"
+}
 
 ffmpeg_options = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
@@ -54,20 +63,31 @@ class YouTubeSource(PlayerSource):
         self._queue = queue
 
     async def load(self):
-        (url2, duration, name) = await YouTubeSource.from_url(self.path)
+        res = await YouTubeSource.from_url(self.path)
+        if res is None:
+            return None
+        
+        (url2, duration, name) = res
         self._source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
         self._duration = duration
         self.display_name = name  # update name too
+        return name
 
     @classmethod
     async def from_url(cls, url):
-        info = ydl.extract_info(url, download=False)
+        res = None
+        try:
+            info = ydl.extract_info(url, download=False)
 
-        return (
-            info["formats"][0]["url"],
-            info["duration"],
-            f"{info['title']} ({convert_dhms_string(info['duration'])})",
-        )
+            res = (
+                info["formats"][0]["url"],
+                info["duration"],
+                f"{info['title']} ({convert_dhms_string(info['duration'])})",
+            )
+        except Exception as e:
+            print(f"youtube-dl v{ytdl_version}", file=sys.stderr)
+            print(e.__str__(), file=sys.stderr)
+        return res
 
     def source(self):
         self._timestamp = time.time()
@@ -124,10 +144,18 @@ class YouTubeSource(PlayerSource):
             # an error happened
             pass
 
-    def enqueue(self, url):
+    async def enqueue(self, url):
+
         if isinstance(url, str):
-            self._queue.append(url)
+            res = await YouTubeSource.from_url(url)
+            if res is not None:
+                self._queue.append(url)
+                return res
         elif isinstance(url, list):
+            for u in url:
+                res = await YouTubeSource.from_url(u)
+                if res is None:
+                    return None
             self._queue += url
 
     def clear(self):
@@ -229,7 +257,8 @@ async def cmd_youtube(
                 desc_list = []
                 for url in player.source._queue:
                     infos = await YouTubeSource.from_url(url)
-                    desc_list.append(f"**[{infos[2]}]({url})**")
+                    if infos is not None:
+                        desc_list.append(f"**[{infos[2]}]({url})**")
 
                 desc = (
                     f"{queue_length} vidéo{'s' if queue_length > 1 else ''} en attente"
@@ -328,21 +357,29 @@ async def cmd_youtube(
             await player.go_to(message.author.voice.channel)
 
             read = True
+            loaded = True
 
+            res = None
             if (
                 player.is_playing()
                 and player.source is not None
                 and isinstance(player.source, YouTubeSource)
             ):
                 read = False
-                player.source.enqueue(urls)
+                res = await player.source.enqueue(urls)
+                loaded = res is not None
             else:
                 youtube_source = YouTubeSource("YouTube", urls, bot.loop)
-                await youtube_source.load()
-                await player.play(youtube_source)
+                res = await youtube_source.load()
+                loaded = res is not None
+                if loaded:
+                    await player.play(youtube_source)
 
             await message.remove_reaction("⏳", bot.user)
 
+            if not loaded:
+                await message.add_reaction("❌")
+                return
             await message.channel.send(
                 embed=discord.Embed(
                     title="YouTube",

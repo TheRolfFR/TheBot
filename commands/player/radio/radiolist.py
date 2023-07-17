@@ -72,7 +72,7 @@ radioList = [
     ),
     RadioDescription(
         display_name="Radio Swiss Jazz",
-        url="https://stream.srg-ssr.ch/rsj/mp3_128.m3u",
+        url="https://stream.srg-ssr.ch/m/rsj/mp3_128",
         aliases=["RadioSwissJazz", "rsj"],
         bitrate=128
     ),

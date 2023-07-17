@@ -12,6 +12,7 @@ from discord.ext import commands
 import asyncio
 
 import googletrans
+from youtube_dl.version import __version__ as ytdl_version
 
 import api
 import keep_alive
@@ -62,7 +63,7 @@ class UTBot(commands.Bot):
 
         if token == "":
             f = open("token.txt")
-            token = f.read()
+            token = f.read().strip()
             f.close()
 
         return token
@@ -93,6 +94,8 @@ async def on_ready():
     print(f"Version discord.py : {discord.__version__}")
     print(f"Name: {bot.user}")
     print(f"ID: {bot.user.id}")
+    print(f"Prefix: {bot.prefix}")
+    print(f"youtube-dl: {ytdl_version}")
     print(f"Serving: {len(bot.guilds)} guilds.")
     print("-----------------------------")
 

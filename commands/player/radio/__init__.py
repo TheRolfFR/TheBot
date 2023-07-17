@@ -216,7 +216,7 @@ async def cmd_radio(
                 error = await message.channel.send(
                     embed=discord.Embed(
                         color=ERROR_COLOR,
-                        description="Impossible de lire la valeur du volume, merci de choisir un réel entre 0 et 100 inclus",
+                        description="Impossible de lire our changer la valeur du volume, merci de choisir un réel entre 0 et 100 inclus",
                     )
                 )
                 await asyncio.sleep(2)
