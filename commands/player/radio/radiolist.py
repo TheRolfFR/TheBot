@@ -17,7 +17,7 @@ radioList = [
     ),
     RadioDescription(
         display_name="BFM Business",
-        url="   http://audio.bfmtv.com/bfmbusiness_128.mp3",
+        url="http://audio.bfmtv.com/bfmbusiness_128.mp3",
         aliases=["BFMBusiness", "bfmb"],
     ),
     RadioDescription(
@@ -72,8 +72,9 @@ radioList = [
     ),
     RadioDescription(
         display_name="Radio Swiss Jazz",
-        url="http://stream.srg-ssr.ch/m/rsj/mp3_128",
+        url="https://stream.srg-ssr.ch/rsj/mp3_128.m3u",
         aliases=["RadioSwissJazz", "rsj"],
+        bitrate=128
     ),
     RadioDescription(
         display_name="Radio Regenbogen",

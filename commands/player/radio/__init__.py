@@ -44,6 +44,8 @@ def find_radio(alias: str):
 
         i += 1
 
+    print(result)
+
     return result
 
 
@@ -74,6 +76,9 @@ async def cmd_radio(
         for radio in radioList:
             if radio != "nggyu":
                 theList += f"\n{str(radio)}"
+
+        print(len(radioList))
+        print(radioList)
         await message.channel.send(theList)
         return
 

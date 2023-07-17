@@ -1,6 +1,7 @@
 import time
 import asyncio
 import os
+import sys
 
 from dotenv import load_dotenv
 
@@ -44,6 +45,7 @@ class UTBot(commands.Bot):
         print("-----------------------------")
         print("Logout")
         print("-----------------------------")
+        print("-----------------------------", file=sys.stderr)
 
         # when stoppped
 
