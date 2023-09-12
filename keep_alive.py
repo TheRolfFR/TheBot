@@ -1,6 +1,12 @@
 import flask
 import threading
 from werkzeug.serving import make_server
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
+PORT = int(os.getenv("PORT", 8060))
 
 app = flask.Flask("myapp")
 
@@ -10,7 +16,7 @@ global server
 class ServerThread(threading.Thread):
     def __init__(self, app):
         threading.Thread.__init__(self)
-        self.srv = make_server("0.0.0.0", 8080, app)
+        self.srv = make_server("0.0.0.0", PORT, app)
         self.ctx = app.app_context()
         self.ctx.push()
 
