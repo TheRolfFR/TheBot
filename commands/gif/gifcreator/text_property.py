@@ -22,13 +22,17 @@ def _drawLine(
     font: ImageFont,
     fontSize,
     emojiDict: dict,
+    stroke_width: int,
+    stroke_fill: tuple,
 ):
     # find emojis
     emojis = EMOJI_REGEX.findall(line)
 
     emojiSize = _emoji_size(fontSize)
 
-    (lineWidth, lineHeight) = d.textsize("EXAMPLE", font=font)
+    bbox = font.getbbox("EXAMPLE")
+    lineWidth = bbox[2] - bbox[0]
+    lineHeight = bbox[3] - bbox[1]
 
     # split line by emojis, really complicated because we need everything
     linearr = []
@@ -66,8 +70,16 @@ def _drawLine(
             offsetX += emojiSize
         else:
             # it's text
-            (lineWidth, lineHeight) = d.textsize(element, font=font)
-            d.text((offsetX, offsetY), element, font=font)
+            bbox = font.getbbox(element)
+            lineWidth = bbox[2] - bbox[0]
+            lineHeight = bbox[3] - bbox[1]
+            d.text(
+                (offsetX, offsetY),
+                element,
+                font=font,
+                stroke_width=stroke_width,
+                stroke_fill=stroke_fill,
+            )
             offsetX += lineWidth
 
     return (
@@ -77,7 +89,7 @@ def _drawLine(
 
 
 class TextProperty:
-    def __init__(self, **kwargs):
+    def __init__(self, stroke_width=0, stroke_fill=None, **kwargs):
         self.backgroundColor = (
             kwargs["backgroundColor"] if "backgroundColor" in kwargs else None
         )
@@ -98,6 +110,9 @@ class TextProperty:
         self.realFontSize = None
 
         self.boxSize = kwargs["boxSize"] if "boxSize" in kwargs else (-1, -1)
+
+        self.stroke_width = stroke_width
+        self.stroke_fill = stroke_fill
 
         if _preload_font:
             self.preloadFont()
@@ -140,7 +155,9 @@ class TextProperty:
                     emojiMatch[0], ""
                 )  # remove da fuck out of the line
 
-            (lineWidth, lineHeight) = draw.textsize(pureLine, font=_font)
+            bbox = _font.getbbox(pureLine)
+            lineWidth = bbox[2] - bbox[0]
+            lineHeight = bbox[3] - bbox[1]
 
             # you need to take into account the emojis width
             lineWidth += emojiSize * len(emojis)
@@ -183,6 +200,15 @@ class TextProperty:
 
             # draw text
             (y, _emoji_dict) = _drawLine(
-                img, draw, x, y, line, self.font, self.realFontSize, _emoji_dict
+                img,
+                draw,
+                x,
+                y,
+                line,
+                self.font,
+                self.realFontSize,
+                _emoji_dict,
+                self.stroke_width,
+                self.stroke_fill,
             )
         return

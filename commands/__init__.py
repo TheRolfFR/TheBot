@@ -17,6 +17,7 @@ from .gif.cfaux import cmd_cfaux
 from .gif.cvrai import cmd_cvrai
 from .gif.ghis import cmd_ghis
 from .gif.evilghis import cmd_evilghis
+from .gif.just_be_normal import cmd_just_be_normal
 from .rageux import cmd_rageux
 from .powered import cmd_powered
 from .fun.quote import cmd_quote
@@ -53,4 +54,5 @@ BOT_SPECIAL_COMMANDS = {
     "rageux": cmd_rageux,
     "powered": cmd_powered,
     "quote": cmd_quote,
+    "normal": cmd_just_be_normal,
 }
