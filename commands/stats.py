@@ -53,7 +53,7 @@ async def cmd_stats(
     # create result embed
     resultEmbed = discord.Embed(
         title=f"Stats du serveur {guild.name}",
-        value="Statistiques du serveur au " + datetime.now().strftime("%d/%m/%Y"),
+        description="Statistiques du serveur au " + datetime.now().strftime("%d/%m/%Y"),
         color=HELP_COLOR,
     )
     resultEmbed.set_thumbnail(url=guild.icon_url)
