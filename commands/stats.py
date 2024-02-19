@@ -159,7 +159,7 @@ async def cmd_roles(
     resultEmbed.set_thumbnail(url=guild.icon.url)
 
     for roleName in membersRoles.keys():
-        resultEmbed.add_field(name=roleName, value=str(len(membersRoles[roleName]))[:25])
+        resultEmbed.add_field(name=roleName[:25], value=str(len(membersRoles[roleName]))[:25])
     await message.channel.send(
         embed=resultEmbed, file=_dict_to_csv_discord_file(membersRoles, "roles")
     )
