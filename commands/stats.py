@@ -35,7 +35,7 @@ async def cmd_stats(
     """Donner toutes les stats du serveurs"""
 
     # get guild
-    guild = message.guild
+    guild: discord.Guild = message.guild
 
     # message must have a guild
     if guild is None:
@@ -56,7 +56,7 @@ async def cmd_stats(
         description="Statistiques du serveur au " + datetime.now().strftime("%d/%m/%Y"),
         color=HELP_COLOR,
     )
-    resultEmbed.set_thumbnail(url=guild.icon_url)
+    resultEmbed.set_thumbnail(url=guild.icon.url) # 'Guild' object has no attribute 'icon_url'
 
     # add owner
     resultEmbed.add_field(
