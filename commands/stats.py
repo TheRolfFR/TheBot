@@ -153,10 +153,10 @@ async def cmd_roles(
 
     resultEmbed = discord.Embed(
         title=f"Roles du serveur {guild.name}",
-        value="Roles du serveur au " + datetime.now().strftime("%d/%m/%Y"),
+        description="Roles du serveur au " + datetime.now().strftime("%d/%m/%Y"),
         color=HELP_COLOR,
     )
-    resultEmbed.set_thumbnail(url=guild.icon_url)
+    resultEmbed.set_thumbnail(url=guild.icon.url)
 
     for roleName in membersRoles.keys():
         resultEmbed.add_field(name=roleName, value=str(len(membersRoles[roleName])))
