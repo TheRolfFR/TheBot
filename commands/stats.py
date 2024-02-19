@@ -214,7 +214,7 @@ async def cmd_ranks(
     resultEmbed.set_thumbnail(url=guild.icon_url)
 
     for roleName in membersRanks.keys():
-        resultEmbed.add_field(name=roleName, value=str(len(membersRanks[roleName])))
+        resultEmbed.add_field(name=roleName, value=str(len(membersRanks[roleName]))[:25])
     await message.channel.send(
         embed=resultEmbed, file=_dict_to_csv_discord_file(membersRanks, "ranks")
     )
