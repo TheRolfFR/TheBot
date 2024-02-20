@@ -56,7 +56,9 @@ async def cmd_stats(
         description="Statistiques du serveur au " + datetime.now().strftime("%d/%m/%Y"),
         color=HELP_COLOR,
     )
-    resultEmbed.set_thumbnail(url=guild.icon.url) # 'Guild' object has no attribute 'icon_url'
+    resultEmbed.set_thumbnail(
+        url=guild.icon.url
+    )  # 'Guild' object has no attribute 'icon_url'
 
     # add owner
     resultEmbed.add_field(
@@ -158,10 +160,23 @@ async def cmd_roles(
     )
     resultEmbed.set_thumbnail(url=guild.icon.url)
 
+    # make a list of all the embeds to post
+    embeds = [resultEmbed]
+    fields = 0
     for roleName in membersRoles.keys():
-        resultEmbed.add_field(name=roleName[:25], value=str(len(membersRoles[roleName]))[:25])
+        # restart a new one
+        if fields == 25:  # max 25 field limits
+            fields = 0
+            embeds.append(discord.Embed(color=HELP_COLOR))
+
+        # get last embed
+        lastEmbed = embeds[-1]
+        lastEmbed.add_field(name=roleName, value=str(len(membersRoles[roleName])))
+        fields += 1
+
+    # send all + file
     await message.channel.send(
-        embed=resultEmbed, file=_dict_to_csv_discord_file(membersRoles, "roles")
+        embeds=embeds, file=_dict_to_csv_discord_file(membersRoles, "roles")
     )
 
 
@@ -214,7 +229,9 @@ async def cmd_ranks(
     resultEmbed.set_thumbnail(url=guild.icon_url)
 
     for roleName in membersRanks.keys():
-        resultEmbed.add_field(name=roleName, value=str(len(membersRanks[roleName]))[:25])
+        resultEmbed.add_field(
+            name=roleName, value=str(len(membersRanks[roleName]))[:25]
+        )
     await message.channel.send(
         embed=resultEmbed, file=_dict_to_csv_discord_file(membersRanks, "ranks")
     )
