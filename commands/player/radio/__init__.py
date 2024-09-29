@@ -1,10 +1,10 @@
+from typing import List
 import discord
 import asyncio
 
-from settings import *
+from settings import CONFIRM_COLOR, ERROR_COLOR, CREATOR_ID
 
 from .radiodescription import RadioDescription
-from commands.player import Player
 from os.path import join, dirname
 from commands.player import PlayerList
 import re
@@ -22,7 +22,7 @@ regexp_url = re.compile(
 )
 
 
-def get_radio_list():
+def get_radio_list() -> List[RadioDescription]:
     """Dynamically imports radio list"""
 
     exec(open(RADIO_LIST_PATH).read())
@@ -43,8 +43,6 @@ def find_radio(alias: str):
             result = radioList[i]
 
         i += 1
-
-    print(result)
 
     return result
 
@@ -68,23 +66,44 @@ async def cmd_radio(
     """
 
     if not args:  # if no args list radios
-        theList = "**Liste des radios :**"
+        title = "**Liste des radios :**"
 
         # hot loading
-        radioList = get_radio_list()
+        radio_list = get_radio_list()
 
-        for radio in radioList:
-            if radio != "nggyu":
-                theList += f"\n{str(radio)}"
+        lines = [str(rd) for rd in radio_list if rd != "nggyu"]
+        content_str = title + "\n" + "\n".join(lines)
 
-        print(len(radioList))
-        print(radioList)
-        await message.channel.send(theList)
+        # first post
+        message = await message.channel.send(content_str)
+        await message.add_reaction("⏳")
+
+        # and then compute statuses
+        rd_status = [(str(rd), rd.status()) for rd in radio_list if rd != "nggyu"]
+        print(rd_status)
+
+        await message.remove_reaction("⏳", bot.user)
+
+        # transform into emojis
+        rd_status_emoji = [
+            (rd, ":white_check_mark:" if status in ["200", "301", "405", "302"] else ":x:") for (rd, status) in rd_status
+        ]
+        # prepare message content
+        okay_ones = filter(lambda rd: rd[1] == ":white_check_mark:", rd_status_emoji)
+        number_ok = len(list(okay_ones))
+        number_total = len(rd_status)
+        fraction = number_ok / number_total
+
+        # edit message
+        lines = [str(rd) + f" {status}" for rd, status in rd_status_emoji]
+        content_str = title + "\n" + "\n".join(lines)
+        content_str += f"\nOperational: {number_ok}/{number_total} {fraction:.0%}"
+
+        await message.edit(content=content_str)
+
         return
 
-    if (
-        isinstance(args, list) and len(args) == 1
-    ):  # pause resume or stop (actions while playing)
+    if isinstance(args, list) and len(args) == 1:  # pause resume or stop (actions while playing)
         # extract action
         action = args[0]
 
@@ -103,21 +122,21 @@ async def cmd_radio(
 
         # do action
         if action == "playing":
-            msg = "La radio n'est pas jouée actuellement"
+            message = "La radio n'est pas jouée actuellement"
 
             radio_name = player.name()
             channel_name = player.channel_name()
             if radio_name:
                 if player.is_paused():
-                    msg = f"La radio { radio_name } est pausée dans le salon { channel_name }"
+                    message = f"La radio { radio_name } est pausée dans le salon { channel_name }"
                 else:
-                    msg = f"La radio { radio_name } est jouée dans le salon { channel_name }"
+                    message = f"La radio { radio_name } est jouée dans le salon { channel_name }"
 
             await message.channel.send(
                 embed=discord.Embed(
                     title="État de la radio",
                     color=CONFIRM_COLOR,
-                    description=msg,
+                    description=message,
                 )
             )
             return
@@ -179,8 +198,7 @@ async def cmd_radio(
                 error = await message.channel.send(
                     embed=discord.Embed(
                         color=ERROR_COLOR,
-                        description=message.author.mention
-                        + ", tu n'es pas dans un channel audio.",
+                        description=message.author.mention + ", tu n'es pas dans un channel audio.",
                     )
                 )
                 await asyncio.sleep(2)

@@ -7,7 +7,7 @@ from .radiodescription import RadioDescription
 radioList = [
     RadioDescription(
         display_name="Autoroute Info",
-        url="http://media.autorouteinfo.fr:8000/direct_nord.mp3",
+        url="https://media.autorouteinfo.fr/direct_nord.mp3",
         aliases=["AutorouteInfo", "ai"],
     ),
     RadioDescription(
@@ -22,8 +22,13 @@ radioList = [
     ),
     RadioDescription(
         display_name="Classic FM",
-        url="http://media-ice.musicradio.com/ClassicFMMP3",
+        url="http://icecast.thisisdax.com/ClassicFMMP3",
         aliases=["ClassicFM", "cfm"],
+    ),
+    RadioDescription(
+        display_name="Europe 2",
+        url="http://europe2.lmn.fm/europe2.mp3",
+        aliases=["Eueope2", "e2", "virgin"],
     ),
     RadioDescription(
         display_name="France Culture",
@@ -41,13 +46,18 @@ radioList = [
         aliases=["FBBesancon", "fbb"],
     ),
     RadioDescription(
+        display_name="France info",
+        url="http://direct.franceinfo.fr/live/franceinfo-midfi.mp3",
+        aliases=["finfo", "fi"]
+    ),
+    RadioDescription(
         display_name="Nostalgie",
-        url="http://185.52.127.160/fr/30601/mp3_128.mp3",
+        url="https://scdn.nrjaudio.fm/adwz2/fr/30601/mp3_128.mp3?origine=fluxradios",
         aliases=["Nostalgie", "nosta"],
     ),
     RadioDescription(
         display_name="Nova",
-        url="http://novazz.ice.infomaniak.ch/novazz-128.mp3",
+        url="http://radionova.ice.infomaniak.ch/radionova-high.mp3",
         aliases=["Nova"],
     ),
     RadioDescription(
@@ -74,7 +84,7 @@ radioList = [
         display_name="Radio Swiss Jazz",
         url="https://stream.srg-ssr.ch/m/rsj/mp3_128",
         aliases=["RadioSwissJazz", "rsj"],
-        bitrate=128
+        bitrate=128,
     ),
     RadioDescription(
         display_name="Radio Regenbogen",
@@ -88,23 +98,18 @@ radioList = [
     ),
     RadioDescription(
         display_name="RTL",
-        url="http://streaming.radio.rtl.fr/rtl-1-44-128",
+        url="http://icecast.rtl.fr/rtl-1-44-128?listen=webCwsBCggNCQgLDQUGBAcGBg",
         aliases=["RTL"],
     ),
     RadioDescription(
         display_name="RTL2",
-        url="http://streaming.radio.rtl2.fr/rtl2-1-44-128",
+        url="http://icecast.rtl2.fr/rtl2-1-44-128?listen=webCwsBCggNCQgLDQUGBAcGBg",
         aliases=["RTL2"],
     ),
     RadioDescription(
         display_name="Skyrock",
         url="http://icecast.skyrock.net/s/natio_mp3_128k",
         aliases=["Skyrock", "s"],
-    ),
-    RadioDescription(
-        display_name="Virgin Radio",
-        url="http://ais-live.cloud-services.paris:8000/virgin.mp3",
-        aliases=["VirginRadio", "Virgin"],
     ),
     RadioDescription(
         display_name="Never Gonna Give You Up",

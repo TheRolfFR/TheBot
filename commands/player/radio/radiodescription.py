@@ -1,18 +1,21 @@
-from commands.player.playersource import *
+from commands.player.playersource import PlayerSource
 
 import discord
+import requests
 
 
 class RadioDescription(PlayerSource):
     def __init__(self, display_name: str, url: str, aliases: list, bitrate=None):
-        PlayerSource.__init__(self, display_name, url)
+        super().__init__(display_name, path=url)
         self.aliases = [str(x).lower() for x in aliases]
 
         before_options = None
         # if bitrate is not None:
         #    before_options = " -b:a " + str(bitrate) + "k "
 
-        self._source = discord.FFmpegPCMAudio(source=self.path, before_options=before_options)
+        self._source = discord.FFmpegPCMAudio(
+            source=self.path, before_options=before_options
+        )
 
     def source(self):
         return self._source
@@ -34,8 +37,23 @@ class RadioDescription(PlayerSource):
 
     def __str__(self):
         """str() operator overload"""
-        return "Nom: ``{0}``, Alias: ``{1}``".format(
-            self.display_name, "``, ``".join(self.aliases)
+        return (
+            f"Nom: ``{self.display_name}``"
+            f", Alias: ``{'``, ``'.join(self.aliases)}``"
         )
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def status(self) -> str:
+        """Get radio HTTP link"""
+        try:
+            r = requests.get(self.url, timeout=3, stream=True)
+            code = str(r.status_code)
+        except (requests.ReadTimeout, requests.ConnectionError):
+            code = "ERR"
+        return code
+
+    @property
     def url(self):
         return str(self.path)
