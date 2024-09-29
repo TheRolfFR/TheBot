@@ -1,0 +1,12 @@
+{
+    "python.testing.pytestArgs": [
+        "tests",
+        "-W",
+        "ignore",
+        "-s"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.terminal.activateEnvironment": true,
+    "editor.formatOnSave": false,
+}

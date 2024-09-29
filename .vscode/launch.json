@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Debug: TheBot",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/bot.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
