@@ -1,1 +1,1 @@
-pm2 start bot.py --name TheBot --interpreter python3
+pm2 start --name thebot .venv/bin/python -- bot.py

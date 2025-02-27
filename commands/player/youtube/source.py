@@ -78,8 +78,8 @@ class YouTubeSource(PlayerSource):
             )
             log.info(res)
         except Exception as e:
-            log.error(f"youtube-dl v{ytdl_version}", file=sys.stderr)
-            log.error(e.__str__(), file=sys.stderr)
+            log.error(f"youtube-dl v{ytdl_version}")
+            log.error(str(e))
         return res
 
     def source(self):
