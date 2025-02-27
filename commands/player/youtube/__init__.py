@@ -1,169 +1,21 @@
 import discord
 import asyncio
+from commands.player import PlayerList
+import re
 
-from settings import *
-
-import json
-import youtube_dl
-from youtube_dl.version import __version__ as ytdl_version
+from settings import CONFIRM_COLOR, ERROR_COLOR
+from .source import YouTubeSource
+from utility import convert_dhms_string
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-import os
-from commands.player import PlayerList, PlayerSource, Player
-import re
-import sys
-
-import time
-from utility import convert_dhms_string
-
 regexp_youtube_url = re.compile(
     r"""^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$""", re.IGNORECASE
 )
 
-ytdl_format_options = {
-    "format": "bestaudio",
-    "verbose": os.getenv("DEV", "False") == "True"
-}
-
-ffmpeg_options = {
-    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
-    "options": "-vn",
-}
-
-ydl = youtube_dl.YoutubeDL(ytdl_format_options)
-
-
-class YouTubeSource(PlayerSource):
-    _source: discord.AudioSource
-    _queue: list
-    _player: Player
-    _loop: asyncio.AbstractEventLoop
-    _duration: float
-    _timestamp: float
-    _diff: float
-
-    def __init__(self, display_name: str, urls, loop: asyncio.AbstractEventLoop):
-        self._loop = loop
-        self._diff = 0
-        self._timestamp = 0
-        url = ""
-        queue = []
-
-        if isinstance(urls, str):
-            url = urls
-        elif isinstance(urls, list):
-            url = urls[0]
-            queue = urls[1:]
-
-        super().__init__(display_name, url)
-        self._player = None
-        self._queue = queue
-
-    async def load(self):
-        res = await YouTubeSource.from_url(self.path)
-        if res is None:
-            return None
-        
-        (url2, duration, name) = res
-        self._source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
-        self._duration = duration
-        self.display_name = name  # update name too
-        return name
-
-    @classmethod
-    async def from_url(cls, url):
-        res = None
-        try:
-            info = ydl.extract_info(url, download=False)
-
-            res = (
-                info["formats"][0]["url"],
-                info["duration"],
-                f"{info['title']} ({convert_dhms_string(info['duration'])})",
-            )
-        except Exception as e:
-            print(f"youtube-dl v{ytdl_version}", file=sys.stderr)
-            print(e.__str__(), file=sys.stderr)
-        return res
-
-    def source(self):
-        self._timestamp = time.time()
-        self._diff = 0
-        return self._source
-
-    def after(self, player: Player):
-        self._diff += time.time() - self._timestamp
-        self._timestamp = -1
-        if self._player is None:
-            self._player = player
-
-        return self.nextsong
-
-    def duration(self):
-        return self._duration
-
-    def progress(self):
-        return (
-            round(self._diff, 0)
-            if self._timestamp == -1
-            else round(self._diff + time.time() - self._timestamp, 0)
-        )
-
-    def on_pause(self):
-        now = time.time()
-        super().on_pause()
-        self._diff += now - self._timestamp
-        self._timestamp = -1
-
-    def on_resume(self):
-        self._timestamp = time.time()
-        super().on_resume()
-
-    def nextsong(self, error):
-        if error is not None or len(self._queue) == 0:
-            return
-
-        next = self._queue.pop(0)
-
-        fut = asyncio.run_coroutine_threadsafe(
-            self._player.stop(disconnect=False), self._loop
-        )
-
-        try:
-            fut.result()
-            self.path = next
-            fut = asyncio.run_coroutine_threadsafe(self.load(), self._loop)
-            fut.result()
-            coro = self._player.play(self)
-            fut = asyncio.run_coroutine_threadsafe(coro, self._loop)
-            fut.result()
-        except:
-            # an error happened
-            pass
-
-    async def enqueue(self, url):
-
-        if isinstance(url, str):
-            res = await YouTubeSource.from_url(url)
-            if res is not None:
-                self._queue.append(url)
-                return res
-        elif isinstance(url, list):
-            for u in url:
-                res = await YouTubeSource.from_url(u)
-                if res is None:
-                    return None
-            self._queue += url
-
-    def clear(self):
-        self._queue.clear()
-
-
 CMD_YOUTUBE_NAME = "youtube"
-
 
 async def cmd_youtube(
     bot: discord.Client,
@@ -256,7 +108,7 @@ async def cmd_youtube(
 
                 desc_list = []
                 for url in player.source._queue:
-                    infos = await YouTubeSource.from_url(url)
+                    infos = YouTubeSource.from_url(url)
                     if infos is not None:
                         desc_list.append(f"**[{infos[2]}]({url})**")
 
@@ -318,7 +170,7 @@ async def cmd_youtube(
             await message.add_reaction("⏹️")
         elif action == "skip":
             if isinstance(player.source, YouTubeSource):
-                player.source.nextsong(None)
+                await player.source.nextsong(None)
                 await message.add_reaction("⏭️")
             return
 

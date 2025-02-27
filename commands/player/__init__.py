@@ -1,7 +1,8 @@
-import discord
-import asyncio
+import math
 
-from commands.player.playersource import *
+import discord
+
+from commands.player.playersource import PlayerSource
 
 
 class PlayerList:
@@ -109,16 +110,17 @@ class Player:
             self.vc.source = discord.PCMVolumeTransformer(self.vc.source)
         return
 
-    def setVolume(self, volume):
+    def setVolume(self, volume: any):
         """Changes radio volume"""
         if self.vc.source.is_opus():
             return False
+
         try:
             val = float(volume)
+        except ValueError:
+            val = float('NaN')
 
-            if val < 0.0 or val > 100.0:
-                return False
-        except:
+        if math.isnan(val) or val < 0.0 or val > 100.0:
             return False
 
         self.volume = val

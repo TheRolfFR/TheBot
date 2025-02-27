@@ -43,7 +43,7 @@ BOT_COMMANDS = {
     "stats": cmd_stats,
     "trad": cmd_trad,
     "uptime": cmd_uptime,
-    "youtube": cmd_youtube,
+    "yt": cmd_youtube,
 }
 
 BOT_SPECIAL_COMMANDS = {

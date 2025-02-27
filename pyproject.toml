@@ -3,5 +3,10 @@ name = "thebot"
 version = "0.0.0"
 requires-python = ">=3.10,<3.11"
 
+dynamic = ["dependencies"]
+
 [tool.black]
 line-length = 120
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}

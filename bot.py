@@ -2,26 +2,28 @@ import time
 import asyncio
 import os
 import sys
-
 from dotenv import load_dotenv
+
+import keep_alive
+import googletrans
+import discord
+from discord.ext import commands
+
+
+import api
+
+from settings import ERROR_COLOR, HELP_COLOR, PREFIX
+from commands import BOT_COMMANDS, BOT_SPECIAL_COMMANDS ,SPECIAL_SERVERS
+from commands.botupdate import COMMAND_UPDATE_NAME, cmd_update_bot, reboot_successful
+from commands.mod import cmd_hardlog_update
+from commands.player import PlayerList
+from commands.player.youtube.source import ytdl_version
+from commands.rageux import cmd_rageux
+from commands.sudo import COMMAND_SUDO_NAME, cmd_sudo
+
 
 load_dotenv()
 
-import discord
-from discord.ext import commands
-import asyncio
-
-import googletrans
-from youtube_dl.version import __version__ as ytdl_version
-
-import api
-import keep_alive
-
-from settings import *
-from commands import *
-from commands.mod import cmd_hardlog_update
-from commands.botupdate import *
-from commands.sudo import COMMAND_SUDO_NAME, cmd_sudo
 
 global voicePlayers
 voicePlayers = PlayerList()
@@ -96,6 +98,7 @@ async def on_ready():
     print(f"ID: {bot.user.id}")
     print(f"Prefix: {bot.prefix}")
     print(f"youtube-dl: {ytdl_version}")
+    print(f"googletrans: {googletrans.__version__}")
     print(f"Serving: {len(bot.guilds)} guilds.")
     print("-----------------------------")
 
@@ -185,7 +188,7 @@ async def on_message(message):
             args.append(voicePlayers)
             await cmd_sudo(bot, message, command, args, voicePlayers)
         elif command in command_map.keys():
-            if command in ["radio", "youtube"]:
+            if command in ["radio", "youtube", "yt"]:
                 await command_map[command](bot, message, command, args, voicePlayers)
             else:
                 await command_map[command](bot, message, command, args)

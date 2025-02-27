@@ -6,7 +6,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/bot.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }
