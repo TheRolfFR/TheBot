@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import discord
 import asyncio
 
@@ -53,6 +53,7 @@ async def cmd_radio(
     command: str,
     args: list,
     voicePlayers: PlayerList,
+    target: Optional[discord.Member] = None
 ):
     """
     `{bot_prefix}radio` : affiche la liste des radios
@@ -194,7 +195,8 @@ async def cmd_radio(
                 return
 
             # exit if user not in voice channel
-            if not message.author.voice:
+            target_voice_state = message.author.voice if target is None else target.voice
+            if target_voice_state is None:
                 error = await message.channel.send(
                     embed=discord.Embed(
                         color=ERROR_COLOR,
@@ -208,8 +210,9 @@ async def cmd_radio(
             # get player
             player = voicePlayers.get_player(message.guild)
 
-            # go to voice channel
-            await player.go_to(message.author.voice.channel)
+            # go to targetted voice channel
+            player_channel = message.author.voice.channel if target is None else target.voice.channel
+            await player.go_to(player_channel)
 
             # play radio
             await player.play(radio_desc)

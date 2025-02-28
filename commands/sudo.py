@@ -1,8 +1,8 @@
 import discord
 import asyncio
-import os
+import logging
 
-from settings import *
+from settings import CREATOR_ID
 
 COMMAND_SUDO_NAME = "sudo"
 
@@ -62,6 +62,8 @@ async def cmd_sudo(
             await asyncio.sleep(2)
             await msg.delete()
         except Exception as e:
+            logging.error(str(e))
+            logging.error(repr(e))
             pass
 
     if subcommand == "nggyu" and len(args) >= 2:
@@ -70,11 +72,12 @@ async def cmd_sudo(
         )
 
         from commands.player.radio import cmd_radio
-        cmd_radio(bot, message, ["play", "nggyu"], user_targeted, voicePlayers)
+        await cmd_radio(bot, message, "radio", ["play", "nggyu"], voicePlayers, target=user_targeted)
 
         emb.add_field(name="Action", value="Lancement du troll...", inline=False)
         await result.edit(embed=emb)
         await asyncio.sleep(2)
+    else:
+        await message.delete()
 
-    await message.delete()
     await result.delete()
