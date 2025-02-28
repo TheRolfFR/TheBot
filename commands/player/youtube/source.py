@@ -1,6 +1,6 @@
-import sys
 import time
 import os
+from pathlib import Path
 import logging
 
 import discord
@@ -10,6 +10,8 @@ from yt_dlp import YoutubeDL
 
 from commands.player import PlayerSource, Player
 from utility import convert_dhms_string
+
+log = logging.getLogger(__name__)
 
 ffmpeg_options = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
@@ -23,9 +25,15 @@ ytdl_format_options = {
     'noplaylist': True,
     'extractor_args': {'youtube': {'player_client': ['web_innertube']}}
 }
-ydl = YoutubeDL(ytdl_format_options)
 
-log = logging.getLogger(__name__)
+cookies_path = Path(os.getcwd()) / "cookies.txt"
+if cookies_path.exists() and cookies_path.is_file():
+    ytdl_format_options['cookiefile'] = str(cookies_path)
+    log.info(f"Loading cookies.txt from {ytdl_format_options['cookiefile']}")
+else:
+    log.warning("cookies.txt not found, might not be able to ")
+
+ydl = YoutubeDL(ytdl_format_options)
 
 class YouTubeSource(PlayerSource):
     _source: discord.AudioSource

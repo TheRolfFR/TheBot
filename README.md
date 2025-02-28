@@ -39,6 +39,8 @@ Installer les modules python :
 pip install -r requirements.txt
 ```
 
+Récupérer les cookies de YT https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp et les placer à la racine du projet.
+
 Ajouter un fichier token.txt à la racine avec le token du bot à l'intérieur.
 Vous avez généré ce token sur le portail [Discord developer].
 Vous pouvez créer une application en appuyant sur le bouton ``New application``.
