@@ -16,6 +16,6 @@ GitPython
 python-dotenv
 yt-dlp==2025.2.19
 mojang==1.1.0
-moviepy
+moviepy==1.0.3
 uuid
 

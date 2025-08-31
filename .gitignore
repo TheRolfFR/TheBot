@@ -210,3 +210,5 @@ pip-selfcheck.json
 database/
 token.txt
 cookies.txt
+weather/*
+!weather/*.py

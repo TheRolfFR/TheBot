@@ -20,6 +20,7 @@ from commands.player import PlayerList
 from commands.player.youtube.source import ytdl_version
 from commands.rageux import cmd_rageux
 from commands.sudo import COMMAND_SUDO_NAME, cmd_sudo
+from weather.weather_api import WeatherAPI
 
 
 load_dotenv()
@@ -88,6 +89,11 @@ class UTBot(commands.Bot):
 
 
 async def on_ready():
+    WEATHER_API = bool(os.getenv("WEATHER_API", False))
+    if WEATHER_API:
+        bot.weather_api = WeatherAPI(bot, port=int(os.getenv("WEATHER_API_PORT", 4242)))
+        bot.weather_api_task = bot.loop.create_task(bot.weather_api.start())
+
     await bot.change_presence(
         status=discord.Status.idle, activity=discord.Game(name="Démarrage..")
     )
