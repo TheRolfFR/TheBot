@@ -1,9 +1,13 @@
 import json
 import subprocess
+from subprocess import PIPE
 from discord.ext import commands
+import aiofiles
 from aiohttp import web
 import os
 from pathlib import Path
+import sys
+import tempfile
 
 class WeatherAPI:
     def __init__(self, bot: commands.Bot, host="0.0.0.0", port=8080):
@@ -24,8 +28,31 @@ class WeatherAPI:
         url = request.query.get("url")
         if not url:
             return web.Response(status=400)
-        response = self.run_bin("meteoblue_graph", url, "--output", "lol.png")
-        return web.Response()
+        darkmode = "false" if request.query.get("darkmode", "false") == "false" else "true"
+        transparent = "false" if request.query.get("transparent", "false") == "false" else "true"
+
+        temp_dir = Path(tempfile._get_default_tempdir())
+        temp_name = next(tempfile._get_candidate_names())
+        temp_path = str(temp_dir / temp_name)
+
+        exit_code = self.start_popen(
+            "meteoblue_graph", url,
+            "--output", temp_path,
+            "--darkmode", darkmode,
+            "--transparent", transparent,
+        )
+
+        if exit_code != 0:
+            return web.Response(status=500, text=f"Graph failed with exit code {exit_code}")
+        
+        try:
+            async with aiofiles.open(temp_path, 'rb') as f:
+                data = await f.read()
+            return web.Response(body=data, content_type='image/png')
+        except FileNotFoundError:
+            return web.Response(status=404, text='Image not found')
+        except Exception as e:
+            return web.Response(status=500, text=f"Error: {str(e)}")
 
     async def handle_forecast(self, request):
         url = request.query.get("url")
@@ -61,3 +88,24 @@ class WeatherAPI:
         bin_path = self.api_folder / f"{bin}"
         running = [str(bin_path), *args]
         return subprocess.run(running, capture_output=True)
+
+    def start_popen(self, bin, *args):
+        bin_path = self.api_folder / bin
+        bin_with_args = [str(bin_path), *args]
+        print(" ".join(bin_with_args))
+        process = subprocess.Popen(
+            bin_with_args,
+            stdout=PIPE,
+            stderr=PIPE,
+            text=True
+        )
+        stdout_done = False
+        while not stdout_done:
+            line = process.stdout.readline() or process.stderr.readline()
+            if line == '' and (process.poll() or process.returncode) is not None:
+                stdout_done = True
+            if line:
+                print(line.strip())
+
+        print(f"{bin_path} finished with code {process.returncode}")
+        return process.returncode
