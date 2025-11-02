@@ -14,7 +14,7 @@ class Webserver(commands.Cog):
 
         routes = web.RouteTableDef()
 
-        # @routes.get("/")
+        @routes.get("/hello")
         async def welcome(request: web.Request):
             return web.Response(text="Hello, world")
 
@@ -52,9 +52,10 @@ class Webserver(commands.Cog):
             user = await self.fetch_member(user_id)
             payload: Mapping[str, any] = await request.json()
             
-            embed = discord.Embed.from_dict(payload)
+            text = payload["username"]
+            embeds = [discord.Embed.from_dict(e) for e in payload["embeds"]]
 
-            await user.send(embed=embed)
+            await user.send(text, embeds=embeds)
 
             return web.Response(status=200)
 

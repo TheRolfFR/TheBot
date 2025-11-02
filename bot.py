@@ -86,7 +86,7 @@ class UTBot(commands.Bot):
 
 
 async def on_ready():
-    WEATHER_API = bool(os.getenv("WEATHER_API", False))
+    WEATHER_API = os.getenv("WEATHER_API", "false").lower() == "true"
     if WEATHER_API:
         bot.weather_api = WeatherAPI(bot, port=int(os.getenv("WEATHER_API_PORT", 4242)))
         bot.weather_api_task = bot.loop.create_task(bot.weather_api.start())
@@ -231,7 +231,7 @@ async def main():
     bot.event(on_message_delete)
 
     # then load extensions
-    API = bool(os.getenv("API", False))
+    API = os.environ.get("API", "false").lower() == "true"
     if API:
         await bot.load_extension("api")
 

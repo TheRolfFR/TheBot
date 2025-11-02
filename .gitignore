@@ -212,3 +212,4 @@ token.txt
 cookies.txt
 weather/*
 !weather/*.py
+/*.http
