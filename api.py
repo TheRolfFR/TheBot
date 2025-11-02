@@ -1,28 +1,25 @@
+import os
+from collections.abc import Mapping
+
 from aiohttp import web
 from discord.ext import commands, tasks
 import discord
-import os
-import aiohttp
-
-app = web.Application()
-routes = web.RouteTableDef()
-
-
-def setup(bot):
-    bot.add_cog(Webserver(bot))
-
 
 class Webserver(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot, host=os.environ.get("API_PORT", "0.0.0.0") , port=os.environ.get("API_PORT", 5000)):
         self.bot = bot
-        self.web_server.start()
+        self.web_server_host = host
+        self.webserver_port = int(port)
+        self.password = os.environ.get("API_PASSWORD", "secret_password")  # DONT LEAVE THAT empty
 
-        @routes.get("/")
-        async def welcome(request):
+        routes = web.RouteTableDef()
+
+        # @routes.get("/")
+        async def welcome(request: web.Request):
             return web.Response(text="Hello, world")
 
-        @routes.get("/status/server/{serverId}")
-        async def get_server_status(request):
+        # @routes.get("/status/server/{serverId}")
+        async def get_server_status(request: web.Request):
             try:
                 guild = await self.bot.fetch_guild(request.match_info["serverId"])
                 res = []
@@ -36,8 +33,8 @@ class Webserver(commands.Cog):
                 print(e)
                 return web.Response("Hmmm somethin went wronh", 500)
 
-        @routes.get("/status/user/{name}")
-        async def get_user_status(request):
+        # @routes.get("/status/user/{name}")
+        async def get_user_status(request: web.Request):
             try:
                 res = self.get_user(request.match_info["name"])
                 return web.json_response(data=res, status=200)
@@ -45,20 +42,35 @@ class Webserver(commands.Cog):
                 print(e)
                 return web.Response("Hmmm somethin went wronh", 500)
 
-        self.webserver_port = os.environ.get("API_PORT", 5000)
-        app.add_routes(routes)
+        @routes.post("/send/embed/{user_id}/{password}")
+        async def send_raw_embed(request: web.Request):
+            input_password = request.match_info.get("password")
+            if self.password != input_password:
+                return web.Response(status=404)
 
-    @tasks.loop()
-    async def web_server(self):
-        return
+            user_id = request.match_info["user_id"]
+            user = await self.fetch_member(user_id)
+            payload: Mapping[str, any] = await request.json()
+            
+            embed = discord.Embed.from_dict(payload)
 
-    @web_server.before_loop
-    async def web_server_before_loop(self):
-        await self.bot.wait_until_ready()
-        runner = web.AppRunner(app)
+            await user.send(embed=embed)
+
+            return web.Response(status=200)
+
+        self.app = web.Application()
+        self.app.add_routes(routes)
+
+    async def cog_load(self) -> None:
+        runner = web.AppRunner(self.app)
+
         await runner.setup()
-        site = web.TCPSite(runner, host="0.0.0.0", port=self.webserver_port)
+        site = web.TCPSite(runner, host=self.web_server_host, port=self.webserver_port)
         await site.start()
+
+        print(f"🌍 API running at {site._host}:{site._port}")
+
+        return await super().cog_load()
 
     async def fetch_member(self, id):
         error = None
@@ -74,7 +86,7 @@ class Webserver(commands.Cog):
             i += 1
 
         if result is None:
-            raise e
+            raise error
 
         return result
 
@@ -105,3 +117,6 @@ class Webserver(commands.Cog):
                 user.voice.channel.name if user.voice.channel is not None else None
             )
         return res
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Webserver(bot))

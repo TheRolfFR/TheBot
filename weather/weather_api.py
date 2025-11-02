@@ -95,7 +95,7 @@ class WeatherAPI:
         await self.runner.setup()
         site = web.TCPSite(self.runner, self.host, self.port)
         await site.start()
-        print(f"✅ WeatherAPI running at http://{self.host}:{self.port}")
+        print(f"🌤️ WeatherAPI running at http://{self.host}:{self.port} ✅")
 
     async def stop(self):
         if self.runner:

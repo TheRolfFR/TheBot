@@ -40,11 +40,8 @@ class UTBot(commands.Bot):
             intents=kwargs["intents"],
         )
 
-    def run(self):
-        API = os.getenv("API", False)
-        if API:
-            api.setup(self)
-        super().run(self.read_token())
+    async def run(self):
+        await super().start(self.read_token())
 
         print("-----------------------------")
         print("Logout")
@@ -218,20 +215,30 @@ async def on_message_delete(message: discord.Message):
         bot=bot, message_original=message, message_edite=None, edit=False, delete=True
     )
 
-
-if __name__ == "__main__":
+async def main():
     # start the server to stay alive
     if not os.getenv("DEV", False):
         keep_alive.start()
 
+    # create the instance first
     my_intents = discord.Intents.all()
+    global bot
     bot = UTBot(PREFIX, intents=my_intents)
     bot.event(on_ready)
     bot.event(on_message)
     bot.event(on_message_edit)
     bot.event(on_voice_state_update)
     bot.event(on_message_delete)
-    bot.run()
+
+    # then load extensions
+    API = bool(os.getenv("API", False))
+    if API:
+        await bot.load_extension("api")
+
+    await bot.run()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 # permission integer: 301067378
 # permission integer 8 is administrator
